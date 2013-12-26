@@ -1,0 +1,22 @@
+#  $Id: yarnio.set 1.10 1997/02/12 10:24:35 hardy Exp hardy $
+#
+'@set nntpserver='         /* clear the NNTPSERVER environment variable */
+
+preImportProg = 'ownsoup -q "rgriech|har.*griech|rein.*griech" own.rgriech rgriech && ownsoup -bq vsoup own.vsoup vsoup'
+importProg    = 'f:\yarn\bin\import -u'
+soupProg      = 'vsoup'
+#soupSend      = soupProg '-si nntp://news.swol.de smtp://mailhub.srv.ualberta.ca'
+soupSend      = soupProg '-si nntp://news.swol.de smtp://mail.swol.de'
+#soupRcvNews   = soupProg '-maM -S2 -t8 -T400 -k1500 -h' rcvNewsDir 'nntp://news-s01.ny.us.ibm.net'
+soupRcvNews2  = soupProg '-mai -S2 -t6 -T300 -k1500 -h' rcvNews2Dir value('yarnionews2',,'os2environment')
+#soupRcvNews3  = soupProg '-miM -S2 -t8 -T400 -k1500 -h' rcvNews3Dir 'nntp://news-s01.ca.us.ibm.net'
+soupRcvNews4  = soupProg '-mai -S2 -t10 -T100 -k3000 -h' rcvNews4Dir 'nntp://news.swol.de'
+soupRcvMail   = soupProg '-niM' value('yarniomail',,'os2environment')
+soupRcvMail2  = soupProg '-niM' value('yarniomail2',,'os2environment')
+# pingHost      = 'ping www.ibm.net 10 1 2>&1 > nul'   /* server must not be in %ETC%\hosts */
+# pingHost      = 'dir > nul'                          /* debugging */
+pingHost      = 'ping www.swol.de 10 1 2>&1 > nul'
+connectISP    = 'cmd /c loginisp.cmd NOWAIT'         /* initiate connection */
+hangupISP     = 'cmd /c logoutisp.cmd'               /* kill connection */
+unzipProg     = 'unzip -oq'
+zipProg       = 'zip -0mq'

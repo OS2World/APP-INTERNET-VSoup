@@ -1,0 +1,10 @@
+VSOUP v1.28 - Multi-threaded netmail and news
+client for OS/2 Warp. Potential 200-500% speed
+gain in news reception.   Using included script
+Vsoup can simultaneously:
+*  do multi-threaded news reception and
+*  get news from up to 9 separate NNTP servers and
+*  Post news to NNTP and
+*  Receive mail from up to 9 POP3 servers and
+*  Send mail to SMTP
+VSoup makes SOUP packets for YARN.(req EMX) Freeware.

@@ -1,0 +1,46 @@
+Welcome to VSoup1.2.8, the multithreaded Souper for OS/2.  The archive
+contains two formats of the documentation: text file format and info
+file format.  You can view VSoup.Inf either with the OS/2 view utility
+(view vsoup.inf) or VSoup.Txt with a pager which knows poor (wo)mans
+underline/bold characters, e.g. 'less' is a good choice (less
+vsoup.txt) but 'more' will also work - without highlighting of course.
+
+If you need VSoup.Txt in plain ASCII without highlighting, you could
+use the script below (also contained in the archive):
+
+--------------------------------------------------------------------------------
+/*  rmhigh.cmd
+ *
+ *  removes the highlighting stuff in VSoup.Txt
+ *  invoke with 'rmhigh < vsoup.txt > vsoup.doc'
+ */
+
+IF chars() \= 0 THEN
+    c2 = charin()
+ELSE DO
+    SAY 'need input file on stdin!'
+    EXIT 1
+END
+
+DO WHILE chars() \= 0
+    c1 = c2
+    c2 = charin()
+    IF c2 \= X2C('8') THEN
+	rc = charout( ,c1 )
+    ELSE
+	c2 = charin()
+END
+
+EXIT 0
+--------------------------------------------------------------------------------
+
+
+The standard disclaimer can be found in COPYING.
+
+If you are a first time user of VSoup, you should read the
+documentation.  If you are only upgrading, you should have a look at
+the history section.
+
+
+Hardy Griech, 19-Apr-1997
+rgriech@swol.de

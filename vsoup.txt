@@ -1,0 +1,2771 @@
+===============================================================================
+VSoup1.2.8                     NNTP/POP3/SMTP client                19-Apr-1997
+===============================================================================
+                                        Copyright (c) 1996-1997 by Hardy Griech
+
+TTaabbllee  ooff  CCoonntteennttss
+==================================
+
+1      Introduction to VSoup
+2      Legal Issues
+3      Features
+4      Installation
+4.1    Environment Settings
+4.2    VSoup And YarnIo Troubleshooting
+5      Command Line Options
+5.1    Global Options
+5.2    News Receiving Options
+5.2.1  Note Concerning The -K And -N Options
+5.3    Mail Receiving Option(s)
+5.4    URLs
+5.4.1  Brief Description Of NNTP/POP3/SMTP
+5.4.2  Evaluation Order Of URLs
+5.5    News Reception
+6      Diagnostics
+7      Utilities
+7.1    YarnIo
+7.1.1  YarnIo.Set
+7.1.2  LoginIsp
+7.1.3  LogoutIsp
+7.2    OwnSoup
+7.3    QSoup
+7.4    ConvSoup
+7.5    ModifyEmxH
+7.6    RmHigh
+8      Files
+8.1    The Newsrc File
+8.2    The Score File
+8.2.1  Regular expression syntax
+8.3    Other Files
+9      Insufficiencies, Bugs & Plans
+10     Author & Acknowledgements
+11     History
+12     FAQ
+
+
+11  IInnttrroodduuccttiioonn  ttoo  VVSSoouupp
+==============================================
+
+VVSSoouupp11..22..88 is a multithreaded network mail and news client program
+for OS/2 Warp with TCP/IP (or the Internet Access Kit) installed.  It
+transfers mail and news fetched from a PPOOPP33 server and NNNNTTPP server
+respectively to packets in SSOOUUPP format.  It can also send messages in
+SSOOUUPP reply packets to NNNNTTPP / SSMMTTPP servers.
+
+VVSSoouupp is especially designed to work with YYaarrnn, but it is probable
+that VVSSoouupp will work with most offline newsreaders which expect SSOOUUPP
+as their input and output.
+
+The program requires the eemmxx run-time DLLs.  You can get these from
+e.g.
+
+    ftp://ftp.leo.org/pub/comp/os/os2/leo/gnu/emx+gcc/emxrt.zip
+
+The eemmxx0099cc run-times or newer are required.  eemmxxrreevv should show at
+least revision 50 for the DLLs.  VVSSoouupp may work with an earlier
+version such as eemmxx0099bb, but keep in mind that there were many changes
+in the DLLs concerning multithreading / sockets since eemmxx0099aa.
+
+-------------------------------------------------------------------------------
+!!!!!       MAKE SURE THAT YOU ARE USING THE CORRECT EMX DLL-VERSIONS     !!!!!
+-------------------------------------------------------------------------------
+
+
+22  LLeeggaall  IIssssuueess
+============================
+
+This program is heavily based on ideas and modules from Chin Huangs
+(cthuang@io.org) Souper15.  Thanks to him for both SSoouuppeerr and YYaarrnn.
+
+PPLLEEAASSEE NNOOTTEE TTHHAATT BBUUGG RREEPPOORRTTSS AANNDD EEVVEERRYYTTHHIINNGG EELLSSEE CCOONNCCEERRNNIINNGG VVSSOOUUPP
+SSHHOOUULLDD BBEE DDIIRREECCTTEEDD TTOO HHAARRDDYY GGRRIIEECCHH ((RRGGRRIIEECCHH@@SSWWOOLL..DDEE)),, NNOOTT TTOO CCHHIINN
+HHUUAANNGG!!
+
+
+SSttaannddaarrdd  DDiissccllaaiimmeerr
+--------------------------------------
+
+VVSSoouupp is free software; you can redistribute it and/or modify it
+under the terms of the GGNNUU General Public License (GPL) as published
+by the Free Software Foundation; either version 2, or (at your
+option) any later version.  For more details about the GPL see the
+file CCOOPPYYIINNGG contained in this archive.
+
+VVSSoouupp is distributed in the hope that it will be useful, but WWIITTHHOOUUTT
+AANNYY WWAARRRRAANNTTYY; without even the implied warranty of MMEERRCCHHAANNTTAABBIILLIITTYY or
+FFIITTNNEESSSS FFOORR AA PPAARRTTIICCUULLAARR PPUURRPPOOSSEE.  See the GGNNUU General Public License
+for more details.
+
+
+WWaarrnniinngg
+--------------
+
+Some news sites might see VVSSoouupp as a news sucking utility and might
+feel offended by its use.
+
+The intention is that VVSSoouupp is to be used to receive news for your
+personal use from a reasonable number of newsgroups.
+
+Misuse of this program could conceivably result in a general ban on
+the use of this or similar programs to the detriment of responsible
+VVSSoouupp users who certainly don't want a general ban of VVSSoouupp.
+
+
+33  FFeeaattuurreess
+====================
+
+- Multithreaded news receiving is supported, anything between 1 and
+  10 threads can be started (default 4), and in addition there are
+  several possible strategies for fine tuning.
+
+  Multithreading gives a speed gain of 200%-500% depending on the
+  overall speed of the connection and the number of threads; on the
+  other hand multiple connections have a communication overhead
+  (i.e. the connections must be established, the groups selected).
+  Estimated loss is around 5%...
+
+- all the packets are exchanged in SSOOUUPP format files, i.e. offline
+  readers expecting as input format either SSOOUUPP or UUSSEENNEETT batch
+  format can be used together with VVSSoouupp.
+
+- VVSSoouupp generates a status message as incoming mail.  (this is not
+  in the SSOOUUPP standard, but is recognized by YYaarrnn).  Normally this
+  message is only generated in case of failure (eg., cannot select
+  newsgroup) or when special events occur (eg., when new newsgroups
+  are added), but the generation can be forced to always occur by
+  means of a command line option.
+
+- VVSSoouupp will show some statistic information about data transfer.
+
+- Specification of the required servers is easy by using URLs on the
+  command line.
+
+- It is possible to filter articles by header lines before retrieving
+  the body text, see score file handling.  VVSSoouupp allows regular
+  expression for both group and header patterns, article length is
+  treated special.
+
+- VVSSoouupp detects too low throughput or stuck connections.
+
+- VVSSoouupp knows about NNNNTTPP authentication.
+
+- YarnIo, a script to do VVSSoouupp operation safely (without risk of
+  message loss etc.)  is included in the archive.  YarnIo is capable
+  of simultaneously receiving news from up to nine separate NNNNTTPP news
+  servers, posting news to NNNNTTPP, receiving mail from up to nine PPOOPP33
+  servers and sending mail to SSMMTTPP.
+
+- Other utilities included are
+
+  OwnSoup
+          This, with the help of the YYaarrnn iimmppoorrtt program, redirects
+          news articles matching a specific pattern into a separate
+          mail folder which will show up when you read your mail with
+          YYaarrnn.
+
+          For example you can search newsgroups for any mention of
+          your name or any mention of a program you are interested in.
+
+  QSoup   This appends mail and news messages to the YYaarrnn _r_e_p_l_y
+          _p_a_c_k_e_t file for transmission by VVSSoouupp.
+
+  ConvSoup
+          This transforms all articles from binary SSOOUUPP format to
+          mailbox/USENET format.
+
+- FAQ included.
+
+- source code included.
+
+- freeware according to GPL (without any warranty for correct
+  function etc.).
+
+
+44  IInnssttaallllaattiioonn
+============================
+
+This section describes the installation of VVSSoouupp on a step by step
+basis.  Steps (1)-(4) are for preparation to ensure that you have a
+system configuration which can run VVSSoouupp11..22..88.
+
+The installation instructions assume that you intend to run VVSSoouupp
+with the help of YarnIo.  If you wish to use VVSSoouupp on its own for
+example to benefit from multithreaded news reception, but do not need
+YarnIo, simply skip the steps (7)-(11) and parts of (6).
+
+Anyway you can use YYAARRNNIIOO..CCMMDD as an example.
+
+If you experience any problems take a look at the troubleshooting
+section.
+
+If you are upgrading an older VVSSoouupp version, you should have a look
+at the history section for hints on important changes.
+
+
+1.  your system must be one of the following:
+
+    - OS/2 2.x with TCP/IP (not tested but should work)
+
+    - OS/2 3.0 (Warp) with the 'Internet Access Kit' installed
+
+    - OS/2 3.0 (Warp Connect) with TCP/IP installed
+
+    - anything above
+
+2.  get the latest version of the eemmxx runtime library and install
+    it or check your current installation with eemmxxrreevv.  This should
+    show a revision level higher than or equal to '50'.  If you are
+    not intending to use YarnIo, then add an environment setting of
+    SSEETT EEMMXXOOPPTT==--hh4400 to your CCOONNFFIIGG..SSYYSS as noted in the environment
+    settings section below.
+
+3.  check your environment variables according to the environment
+    settings section below.
+
+4.  check your %%EETTCC%%\\SSEERRVVIICCEESS file to ensure that it contains the
+    following lines:
+
+      smtp         25/tcp mail          #Simple Mail Transfer
+      smtp         25/udp mail          #Simple Mail Transfer
+      pop3        110/tcp               #Post Office Protocol - Version 3
+      pop3        110/udp               #Post Office Protocol - Version 3
+      nntp        119/tcp readnews untp #Network News Transfer Protocol
+      nntp        119/udp readnews untp #Network News Transfer Protocol
+
+    Most probably the %%EETTCC%%\\SSEERRVVIICCEESS file is located either in
+    xx::\\TTCCPPIIPP\\EETTCC or xx::\\MMPPTTNN\\EETTCC.  If you need to specify non-standard
+    port numbers, you should do that in the command line.  Check the
+    URL specification.
+
+5.  unzip the VVSSOOUUPP112277..ZZIIPP archive in a temporary file directory
+    (%%TTMMPP%% is a good place).
+
+6.  copy the following files into a subdirectory of your choice
+    (using a subdirectory contained in the PPAATTHH statement is always a
+    good choice):
+
+    - VVSSOOUUPP..EEXXEE, the VVSSoouupp executable
+
+    - YYAARRNNIIOO..CCMMDD, the YarnIo script
+
+    - YARNIO.SET, the YarnIo configuration file
+
+      Note:   YYAARRNNIIOO..CCMMDD & YARNIO.SET must reside in the same
+              subdirectory and must have the same filename, except
+              the extension...
+
+    - If you want YarnIo dial automatically, then you should also
+      copy LOGINISP.CMD and LOGOUTISP.CMD as templates for your own
+      connect/disconnect scripts.
+
+    - OWNSOUP.EXE and/or QSOUP.EXE and/or CONVSOUP.EXE should be
+      copied if required.
+
+    - If you want to have help available, then copy also the
+      documentation: either VVSSOOUUPP..IINNFF or VVSSOOUUPP..TTXXTT (both have the
+      same content but different format).
+
+    - If you are interested in the source code, move it also to a
+      specific subdirectory.
+
+7.  review the Command Line Options section below and edit the
+    YARNIO.SET configuration file according to your specific needs.
+    Also read the comments in YARNIO.SET.
+
+    Note:   the setup of YARNIO.SET is required only once.  In
+            future, updates will be made by amending YYAARRNNIIOO..CCMMDD.
+
+8.  If you wish YYAARRNNIIOO..CCMMDD to dial for you, you must also setup the
+    scripts LOGINISP.CMD and LOGOUTISP.CMD to reflect your needs.
+
+    Another option is to use your dialer to call your ISP (provider)
+    and start YarnIo after the connection has been established.  The
+    disadvantage of doing it this way is that after completion of
+    YarnIo the dialer will not hang up immediately.
+
+    Note:   If you have only FAT drives you have to rename
+            LOGOUTISP.CMD to something else.  Therefor you have to
+            change the hhaanngguuppIISSPP setting in YARNIO.SET too.
+
+9.  setup the directory structure for YarnIo:
+
+      %HOME%ÄÄ yarn             - subdirectory containing Yarn config file
+               :
+               ÃÄÄ in           - root of YarnIo input subdirectories
+               ³   ÃÄÄ mail     - primary     subdir for EMail reception
+               ³   ÃÄÄ mail2    - optional #2 subdir for EMail reception
+               ³   ÃÄÄ :                          :
+               ³   ÃÄÄ mail9    - optional #9 subdir for EMail reception
+               ³   ³
+               ³   ÃÄÄ news     - primary     subdir for news reception
+               ³   ÃÄÄ news2    - optional #2 subdir for news reception
+               ³   ÃÄÄ :                          :
+               ³   ÀÄÄ news9    - optional #9 subdir for news reception
+               ÃÄÄ out          - subdirectory for EMail&news transmission
+               :
+
+    In each of the NNEEWWSS subdirectories you will need to create an
+    appropriate NNEEWWSSRRCC file as detailed in the Newsrc File section.
+
+    The ....MMAAIILL, ....MMAAIILL22 until ....MMAAIILL99 subdirectories have to be
+    created only.  They should be left empty.
+
+    The number of subdirectories depend on the number of servers you
+    wish to poll.
+
+10. change the following line in the Yarn-config file
+    (%%HHOOMMEE%%\\YYAARRNN\\CCOONNFFIIGG):
+
+      reply-packet=%HOME%\yarn\out\reply.zip
+
+    If this is omitted or is incorrect then transmission of replies
+    will not be possible, because YYaarrnn will move its output to a
+    place where VVSSoouupp does not expect it!  Of course %%HHOOMMEE%% should be
+    replaced by the actual value of HHOOMMEE.
+
+11. if you have setup LOGINISP.CMD and LOGOUTISP.CMD, start YarnIo
+    directly.  Otherwise first dial-in to your ISP and then start
+    YarnIo.
+
+When you first start using VVSSoouupp I recommend that you add the --MM
+option to each call of VVSSoouupp (e.g. in YARNIO.SET) to force generation
+of the status mail.  This can be a good debugging aid...
+
+
+44..11  EEnnvviirroonnmmeenntt  SSeettttiinnggss
+------------------------------------------------
+
+Environment variables are set in your CCOONNFFIIGG..SSYYSS by lines such as:
+
+  SET ETC=D:\TCPIP\ETC
+
+Also they can be set in a dedicated script, which calls VVSSoouupp11..22..88.
+
+EEMMXXOOPPTT  This are the settings for the eemmxx runtime DLLs.  Recommended
+        setting of this variable should contain --hh4400 to allow 40
+        file handles (not required, if you are calling VVSSoouupp through
+        YarnIo).
+
+EETTCC     This is needed for accessing the TCP/IP configuration
+        contained in the file %%EETTCC%%\\TTCCPPOOSS22..IINNII.  If --ii is specified
+        in the command line, EETTCC is not required.
+
+HHOOMMEE    your home directory (can also be specified on the command
+        line).  If HHOOMMEE is not defined, it defaults to the current
+        directory.
+
+MMAAIILLEERR  command for transmitting EMails (the EMail is piped into the
+        stdin of MMAAIILLEERR).  If VVSSoouupp should do the job, MMAAIILLEERR must be
+        undefined.
+
+NNNNTTPPSSEERRVVEERR
+        hostname of the nntp server (can also be specified in the
+        command line).  This variable is, in my opinion, obsolete and
+        remains only to avoid compatibility problems.
+
+PPOOSSTTEERR  command for transmitting news (the article is piped into the
+        stdin of PPOOSSTTEERR).  If VVSSoouupp should do the job, PPOOSSTTEERR must be
+        undefined.
+
+TTMMPP     points to the subdirectory which holds temporary files (VVSSoouupp
+        generates ssoouupp_<_x_x_x_x_>..ttmmpp as temporaries, with _<_x_x_x_x_> being a
+        number between 0000 and 9999).  If TTMMPP does not exist, the
+        temporaries will be generated in the current subdirectory.
+
+TTZZ      setting of your time zone (e.g. mine is MMEETT--11MMEESS).  Due
+        to a bug in the eemmxx runtime, the setting of this variable
+        is critical for correct functioning of the eemmxx C library
+        revision 50.  Check the eemmxx runtime documentation for the
+        syntax of the TTZZ settings.
+
+        An incorrect setting of TTZZ can also cause errors if you
+        appear to be getting mail before it was sent.
+
+
+44..22  VVSSoouupp  AAnndd  YYaarrnnIIoo  TTrroouubblleesshhoooottiinngg
+------------------------------------------------------------------------
+
+some simple checks can be carried out:
+
+- read the FAQ section.
+
+- if VVSSoouupp does not run at all, initiate VVSSoouupp with VVSSOOUUPP --??.  This
+  should output the usage information to the screen.  If it does not,
+  you have to check your system configuration.  Otherwise you should
+  try to call VVSSoouupp in its different modes directly from the command
+  line to check all your command line options.
+
+- generate the VVSSoouupp status mail with --MM and check if it tells you
+  the expected file locations and server names.
+
+- is the configuration file YARNIO.SET correct and in the same
+  directory as YYAARRNNIIOO..CCMMDD?
+
+- is the subdirectory setup correct for YarnIo?
+
+- does the ppiinnggHHoosstt command work as expected?  Issue the program via
+  RREEXXXXTTRRYY to check the return values in connected/disconnected case.
+
+- if you have a setup including LOGINISP.CMD and LOGOUTISP.CMD you
+  can also check if they work.  Run LOGINISP.CMD from a command line
+  - login should be performed.  Then run LOGOUTISP.CMD - logout
+  should be performed.  Now also the YarnIo auto-dial/hangup should
+  work...
+
+- connect to your ISP and try YYAARRNNIIOO --RRCCVVMMAAIILL --SSEENNDD --RRCCVVNNEEWWSS22.  This
+  will start only the YYaarrnnIIoo RRCCVVNNEEWWSS window (hit ctrl-ESC and open
+  it).  News reception should be performed as expected, at the end
+  iimmppoorrtt to yarn will be initiated (after that 30s pause).
+
+  You can check all single YarnIo modes this way.
+
+- is VVSSoouupp called in each window started by YarnIo?
+
+
+55  CCoommmmaanndd  LLiinnee  OOppttiioonnss
+============================================
+
+This section describes the VVSSoouupp command line options in detail.  An
+example is presented first.
+
+
+EExxaammppllee
+--------------
+
+  VSoup -m -h d:\yourHomedir nntp://your.news.server
+
+This would start VVSSoouupp telling it not to fetch mail (i.e. to collect
+news only) using a home directory called dd::\\yyoouurrHHoommeeddiirr from a news
+server named yyoouurr..nneewwss..sseerrvveerr.  The llooggiinniidd and ppaasssswwoorrdd would by
+default be taken from your TCP/IP configuration.
+
+
+55..11  GGlloobbaall  OOppttiioonnss
+------------------------------------
+
+--hh_<_d_i_r_>
+        sets the home directory for the VVSSoouupp operation.  You can
+        also specify your home directory through the environment
+        variable HHOOMMEE.
+
+--ii      ignore the settings of the TCP/IP configuration.
+
+--mm      do not fetch mail.
+
+--MM      generate the VVSSoouupp status mail ..\\SSTTSSMMAAIILL..MMSSGG in any case.
+        Default is to generate the message in case of error only.
+
+--nn      do not fetch news.
+
+--rr      read only mode.  Only the ..\\AARREEAASS, ..\\0000**..MMSSGG, ..\\0000**..IIDDXX
+        files are written (e.g. %%HHOOMMEE%%\\NNEEWWSSTTIIMMEE, %%HHOOMMEE%%\\NNEEWWSSRRCC are
+        not written).  Also the EMails are not deleted from the PPOOPP33
+        server.  Main purpose for this option is debugging.
+
+--ss      send replies.  Do not use this option in combination with --mm
+        or --nn, if you do it will be ignored.
+
+--TT_<_n_>   throughput must be higher than _<_n_>, otherwise transfer will
+        be aborted.  Throughput is checked against the limit _<_n_>
+        every 10s after data transfer has begun.  If 6 samples show
+        not enough throughput, VVSSoouupp will be aborted.  Default is '0
+        bytes/s', i.e. it will be checked for a stuck connection.
+        Use --TT--_<_n_> to check your throughput conditions.  Special case
+        is --TT--11, which disables throughput check.
+
+
+55..22  NNeewwss  RReecceeiivviinngg  OOppttiioonnss
+----------------------------------------------------
+
+--aa      add new newsgroups to the %%HHOOMMEE%%\\NNEEWWSSRRCC file.  If there are
+        any new groups on the server, the generation of the status
+        message will be forced.  The new newsgroups will be added in
+        the unsubscribed state.
+
+--cc[[nn]]   catchup: mark every article as read except for the last nn
+        ( default is 10).
+
+--kk_<_n_>   set maximum news packet size to n KBytes (default is no
+        limit).  _<_n_> indicates the total amount of received messages,
+        not the size of a single message (this can be done through
+        scoring).
+
+--KK_<_f_i_l_e_>
+        set the name of the score file (see note below concerning
+        -K/-N options).
+
+--NN_<_f_i_l_e_>
+        set the name of the NNEEWWSSRRCC file (see note below regarding
+        -K/-N options).
+
+--SS_<_n_>   receiving strategy (_<_n_>=0..2).  Speed increases (at least
+        it should) in the direction 0 to 2, danger of receiving
+        crossposted articles increases also from 0 to 2.  The default
+        of 1 is ok for most cases, but this parameter is an issue of
+        fine tuning!
+
+        How the strategy parameter operates:
+
+        --SS00       groups are read sequentially, i.e. all threads are
+                fetching articles from only one group.
+
+        --SS11       if one thread goes into waiting state the next group
+                will be accessed - only small modification of the
+                above.
+
+        --SS22       VVSSoouupp tries to keep all threads busy.  I.e.  each
+                thread accesses one dedicated group, groups are read
+                in parallel (if there are no more groups to access,
+                the waiting threads are used for parallel reading
+                from one group).
+
+        Recommendation:
+
+        -   If you have a lot of groups with small amount of articles
+          per fetch and only a little bit cross-posting, --SS22 will
+          be the best option for you.  If you allow reception of
+          crossposted articles (see option --xx), --SS22 will be best for
+          you in any case.
+
+        -   if you are accessing groups with large articles (i.e. cost
+          of double reception of crossposted articles is high), --SS00
+          will be the best for you.
+
+--tt_<_n_>   receive the news with _<_n_> threads, i.e. connect to the NNNNTTPP
+        server _<_n_> times (limits are 1-10, default 4).
+
+--uu      create news summary.  Output can be found in the ..\\0000**..IIDDXX
+        files.  Be aware that the summarized articles are marked as
+        read (one way to get out of this, is to call VVSSoouupp with --rr).
+
+--xx      do not process news Xref headers, i.e. allow reception of
+        crossposted articles.
+
+
+55..22..11  NNoottee  CCoonncceerrnniinngg  TThhee  --KK  AAnndd  --NN  OOppttiioonnss
+--------------------------------------------------------------------------------------
+
+If you are using the --hh option then use of either of the options --KK
+or --NN is not recommended, because behavior is not very transparent.
+
+If the --hh option is placed behind the --KK / --NN options the result will
+not be as expected - VVSSoouupp (and SSoouuppeerr) will revert to SSCCOORREE and
+NNEEWWSSRRCC in the new specified home directory.
+
+If --KK / --NN options are placed behind the --hh option and do not contain
+absolute paths, they will not be located in the home directory
+specified by --hh.
+
+This is confusing and will be fixed in a future release.
+
+IITT IISS BBEETTTTEERR AANNDD CCLLEEAANNEERR TTOO UUSSEE --HH AANNDD SSEETTUUPP TTHHEE SSPPEECCIIAALL SSCCOORREE//NNEEWWSSRRCC
+FFIILLEESS IINN TTHHAATT SSUUBBDDIIRREECCTTOORRYY!!
+
+
+55..33  MMaaiill  RReecceeiivviinngg  OOppttiioonn((ss))
+--------------------------------------------------------
+
+--DD      If specified, VVSSoouupp will logout and login after reception of
+        each EMail, thus effectively forcing deletion of the letter
+        on the PPOOPP33 server.  This is useful, if your connection
+        to the PPOOPP33 server is aborted often and your mailbox is
+        full.  Normal behaviour is to retrieve EMail without
+        disconnecting/connecting.
+
+
+55..44  UURRLLss
+----------------
+
+The addresses of the hosts are given in UUnified RResource LLocator
+(URL) form.  These do not fully conform to the standard, so a short
+explanation follows:
+
+- nnnnttpp::////[[UUsseerrIIdd[[::PPaasssswwoorrdd]]@@]]nnnnttpp--hhoosstt[[::ppoorrtt]] defines the address of
+  your NNNNTTPP server (i.e. news server).  UUsseerrIIdd and PPaasssswwoorrdd can be
+  given if required for AUTHINFO.
+
+- ppoopp33::////[[UUsseerrIIdd[[::PPaasssswwoorrdd]]@@]]ppoopp33--hhoosstt[[::ppoorrtt]] defines the address of
+  your PPOOPP33 server.  UUsseerrIIdd and PPaasssswwoorrdd are usually required.
+
+- ssmmttpp::////[[UUsseerrIIdd[[::ppaasssswwoorrdd]]@@]]ssmmttpp--ggaatteewwaayy[[::ppoorrtt]] defines your SSMMTTPP
+  gateway.  UUsseerrIIdd and PPaasssswwoorrdd are not required, in fact they are
+  ignored by VVSSoouupp11..22..88!
+
+The URL-feature makes VVSSoouupp different to SSoouuppeerr1166, which wants to see
+a %%HHOOMMEE%%\\NNEEWWSSAAUUTTHH file for NNNNTTPP authorization.
+
+Notes:
+
+1.  It is not intended to implement other protocols like hhttttpp or so.
+
+2.  If ppoorrtt is not specified, the actual port number is taken from
+    the %%EETTCC%%\\SSEERRVVIICCEESS file.  This is the recommended way of port
+    number handling.
+
+
+55..44..11  BBrriieeff  DDeessccrriippttiioonn  OOff  NNNNTTPP//PPOOPP33//SSMMTTPP
+----------------------------------------------------------------------------------
+
+Mail can be compared to the postal service, just like a letter.
+EMail-reception is handled through PPOOPP33 server (ppoopp33:://// prefix),
+transmission through SSMMTTPP gateways (ssmmttpp:://// prefix).
+
+News messages are more like broadcasting, everybody will 'hear' your
+message.  News messages are transmitted and received via NNNNTTPP servers
+(nnnnttpp:://// prefix).
+
+Perhaps it is a little bit confusing, that you can also deliver news
+via EMail service (just like the YYaarrnn list).  The other way around is
+not possible...
+
+Anyway, please don't mix up news and EMail (your EMail might be news,
+but in these terms they remain EMails).
+
+
+55..44..22  EEvvaalluuaattiioonn  OOrrddeerr  OOff  UURRLLss
+------------------------------------------------------------
+
+VVSSoouupp evaluates URLs in the following order:
+
+1.  take all information from the 'Internet Connection for OS/2'
+    notebook settings
+
+2.  check the NNNNTTPPSSEERRVVEERR environment settings
+
+    Note1:  NNNNTTPPSSEERRVVEERR is a URL without leading nnnnttpp::////
+
+    Note2:  there are no environment variables for the SSMMTTPP / PPOOPP33
+            setup.
+
+3.  command line options
+
+If you specify only e.g. nnnnttpp::////yyoouurr..nneewwss..sseerrvveerr in the command line
+(without userid/password), the userid and password from the TCP/IP
+configuration are taken as a standard value.
+
+
+55..55  NNeewwss  RReecceeppttiioonn
+------------------------------------
+
+For news reception you have the following options (which cannot
+combined):
+
+- either process ..\\CCOOMMMMAANNDDSS (..\\CCOOMMMMAANNDDSS exists),
+
+- or catch-up the newsgroups (--cc option),
+
+- or create newsgroups summary (--uu option),
+
+- or receive the news in the standard way (no specific option).
+
+New newsgroups are added to the %%HHOOMMEE%%\\NNEEWWSSRRCC file, when news is
+received in the standard way and the command line option --aa is given.
+
+
+66  DDiiaaggnnoossttiiccss
+==========================
+
+VVSSoouupp returns with an exit code of 11, if any operation failed.
+Otherwise return code will be 00.
+
+Failing operations are:
+
+- bad command line options,
+
+- bad setup (e.g. no EETTCC set, but 'Internet Connection' settings
+  requested),
+
+- bad OS (e.g. D*ø@!S),
+
+- user hit ^C or ^BREAK,
+
+- throughput check failed (e.g. connection broken),
+
+- could not setup connection (e.g. server not defined, server does
+  not exist, server is down, etc.),
+
+- there was no ..\\RREEPPLLIIEESS file and you have requested --ss,
+
+- ..\\RREEPPLLIIEESS contains an illegal entry,
+
+- ..\\MMAAIILL..MMSSGG or ..\\NNEEWWSS..MMSSGG is malformed,
+
+- could not deliver news article, e.g. NNNNTTPP server did not allow it,
+
+- could not deliver mail, e.g. PPOOPP33 authentication failed,
+
+- MMAAIILLEERR / PPOOSSTTEERR contains illegal value,
+
+- there is no NNEEWWSSRRCC file,
+
+
+..\\SSTTSSMMAAIILL..MMSSGG
+--------------------------
+
+In case of an error condition the status message ..\\SSTTSSMMAAIILL..MMSSGG will
+be generated.  Under the following additional cases ..\\SSTTSSMMAAIILL..MMSSGG
+will be generated too:
+
+- VVSSoouupp was called with the --MM option (force ..\\SSTTSSMMAAIILL..MMSSGG
+  generation),
+
+- VVSSoouupp was called with --aa and there were new newsgroups on your NNNNTTPP
+  server,
+
+- VVSSoouupp could not select a newsgroup specified in NNEEWWSSRRCC,
+
+- VVSSoouupp could not select a newsgroup specified in ..\\CCOOMMMMAANNDDSS,
+
+- a newsgroup specified in ..\\CCOOMMMMAANNDDSS was not contained in NNEEWWSSRRCC,
+
+- there was another command than sseennddmmee contained in ..\\CCOOMMMMAANNDDSS,
+
+- a specified (--KK_<_f_i_l_e_>) score file does not exist.
+
+- ..\\RREEPPLLIIEESS contained an illegal (i.e. not understood by VVSSoouupp11..22..88)
+  reply type.  Legal reply types are 'b' and 'B',
+
+- ..\\RREEPPLLIIEESS contained an illegal (i.e. not understood by VVSSoouupp11..22..88)
+  reply kind.  Legal reply kinds are ""mmaaiill"" and ""nneewwss"".
+
+
+FFuuttuurree  eexxtteennssiioonnss
+----------------------------------
+
+The following failing operations are NOT yet implemented fully:
+
+- there was no EMail in your PPOOPP33 mailbox,
+
+- there were no new news,
+
+- you have requested --ss, but a message file is missing (VVSSoouupp deletes
+  message files immediately after successful delivery.  Note that if
+  you need two runs to deliver all your messages e.g. one file will
+  be missing on the second attempt.  This is considered ok).
+
+It is possible, that diagnostics code will change in the future.
+Return codes with a cleared bit 0 (like 0,2,4,...)  will indicate
+a non-fatal condition, return codes with a set bit 0 will indicate
+fatal conditions.
+
+
+77  UUttiilliittiieess
+======================
+
+This section describes the several utilities contained in
+VVSSOOUUPP112277..ZZIIPP archive in more detail.  For most users only the YarnIo
+files will be of interest.
+
+
+77..11  YYaarrnnIIoo
+--------------------
+
+As stated before YarnIo - actually consisting of YYAARRNNIIOO..CCMMDD,
+YARNIO.SET and optionally of LOGINISP.CMD and LOGOUTISP.CMD - is
+responsible for safe VVSSoouupp I/O operations.  The script(s) handle(s)
+the complete I/O between YYaarrnn and the internet world.  Newsgroups are
+read from up to nine NNNNTTPP servers, mail/news packets are transmitted
+and mail is received again from up to nine PPOOPP33 servers - all
+simultaneously.  Actions can be disabled individually (type YYAARRNNIIOO ??
+for more information).
+
+The script should be started directly after the connection has been
+established.  It is also possible to let YarnIo dial out to establish
+the connection.  To do this you must provide the two scripts
+LOGINISP.CMD and LOGOUTISP.CMD (see the installation section).
+
+Most items of the user configuration are in a file called
+YARNIO.SET.  It contains the settings for the initialization of the
+external programs including VVSSoouupp, iimmppoorrtt ...  calls.
+
+    YYoouu WWIILLLL nneeeedd ttoo aammeenndd tthhee ddeettaaiillss iinn tthhee YYAARRNNIIOO..SSEETT ffiillee..
+
+Sorry, but the directory structure must be set up manually!  You
+should follow the structure given above in the installation section.
+
+
+77..11..11  YYaarrnnIIoo..SSeett
+--------------------------------
+
+For configuration of YarnIo, YARNIO.SET is required.  YARNIO.SET must
+reside in the same directory as YYAARRNNIIOO..CCMMDD and must have the same
+filename prefix (i.e. YYAARRNNIIOO).
+
+YARNIO.SET contains the statements which determine how YYAARRNNIIOO..CCMMDD is
+to call the several commands.
+
+To give you an idea what must be configured in YARNIO.SET, an example
+follows.  There is a YARNIO.SET contained in the archive, which
+includes more comments.
+
+  :
+'@SET NNTPSERVER='
+
+preImportProg = 'ownsoup -q rgriech stuff4me OwnTemp'
+importProg    = 'import.exe -u'
+soupProg      = 'vsoup.exe'
+soupSend      = soupProg '-s nntp://xmt.nntp.server'
+soupRcvNews   = soupProg '-mai' '-h' rcvNewsDir 'nntp://1st.nntp.server'
+soupRcvNews2  = soupProg '-mai' '-h' rcvNews2Dir 'nntp://2nd.nntp.server'
+soupRcvMail   = soupProg '-n'
+pingHost      = 'slipwait 2 2>&1 > nul'
+connectISP    = 'cmd /c loginisp.cmd NOWAIT'
+hangupISP     = 'cmd /c logoutisp.cmd'
+unzipProg     = 'unzip.exe -oq'
+zipProg       = 'zip -0mq'
+  :
+
+
+RReemmaarrkkss
+--------------
+
+- Instead of sslliippwwaaiitt you could also use the command ''ppiinngg xx..yy..zz 11
+  22>>&&11 >> nnuull''.  The host xx..yy..zz in ppiinnggHHoosstt must NNOOTT be contained in
+  the %%EETTCC%%\\HHOOSSTTSS, because otherwise ppiinnggHHoosstt will return unexpected
+  results.
+
+- Do not remove the option ''--hh'' rrccvvNNeewwssDDiirr from the ssoouuppRRccvvNNeewwss line
+  or the option ''--hh'' rrccvvNNeewwss22DDiirr from the ssoouuppRRccvvNNeewwss22 line.
+
+- If you are not interested in a service (e.g. ssoouuppRRccvvNNeewwss22), set the
+  corresponding variable to '' (empty string).
+
+- If required, you can change the environment settings in YARNIO.SET,
+  e.g. the above ''@@SSEETT NNNNTTPPSSEERRVVEERR=='' clears an existing NNNNTTPPSSEERRVVEERR
+  environment variable.
+
+- To enable news server #3..#9, you have to add
+  ssoouuppRRccvvNNeewwss33..ssoouuppRRccvvNNeewwss99 lines into YARNIO.SET.  Use ssoouuppRRccvvNNeewwss22
+  as a template.  Of course you have to set up the corresponding
+  Newsrc Files in the respective subdirectories.
+
+  For PPOOPP33 server #2..#9 you have to set up
+  ssoouuppRRccvvMMaaiill22..ssoouuppRRccvvMMaaiill99.  You have to create the corresponding
+  subdirectories manually.
+
+  For setting up the correct subdirectory structure see also the
+  Installation section.
+
+
+77..11..22  LLooggiinnIIsspp
+----------------------------
+
+LOGINISP.CMD is an optional script, which allows YarnIo to dial in
+to your ISP.  The following example script will connect using the
+internet dialer.  If you are a customer of Advantis the script will
+work for you without any changes - of course you have to insert the
+correct aaccccoouunntt uusseerr ppaasssswwdd information.
+
+/*
+  LoginIsp  -  rg211096
+
+  Login to your ISP.  If Option NOWAIT is given, the command will not wait
+  until connection has been established.
+
+  You have to do the following configuration:
+  -  the line '...logoutisp...' must show the effective logoff script
+  -  the line '...start...' must show the effective call of the dialer
+  -  the line '...ping...' must show a pinger to check connection
+ */
+
+call RxFuncAdd 'SysLoadFuncs', 'RexxUtil', 'SysLoadFuncs'
+call SysLoadFuncs
+
+TRACE('')
+
+option = ARG(1)
+
+DO FOREVER
+    '@cmd /c logoutisp.cmd'
+    '@start dialer.exe account user passwd '-m'
+    IF option = 'NOWAIT' THEN
+        LEAVE
+
+    DO j = 1 TO 20
+        rc = SysSleep(3)
+        '@ping www.cdrom.com 2>&1 > nul'
+        IF rc = 0 THEN
+            EXIT
+    END j
+END
+
+EXIT
+
+Note1:  You will find an almost identical LOGINISP.CMD in the
+        VVSSOOUUPP112277..ZZIIPP archive.
+
+Note2:  This LOGINISP.CMD requires a working LOGOUTISP.CMD.
+
+
+77..11..33  LLooggoouuttIIsspp
+------------------------------
+
+LOGOUTISP.CMD is an optional script, which allows YarnIo to
+disconnect from your ISP.  The following example script will
+disconnect using the internet dialer.  If you are a customer of
+Advantis the script will work for you without any changes - other
+than maybe changing ddiiaalleerr and ccoommPPoorrtt.
+
+This script is a little bit more complicated than LOGINISP.CMD,
+because it will
+
+1.  block itself to avoid multiple instances of itself
+
+2.  wait until the dialer has been closed
+
+3.  force a disconnect of the modem through switching DTR
+
+An almost identical version of the script is contained in the
+VVSSOOUUPP112277..ZZIIPP archive.
+
+/*
+  LogoutIsp  -  rg211096
+
+  Logoff from your ISP.
+
+  The lines dialer/dialerClose,comPort must be configured
+*/
+
+call RxFuncAdd 'SysLoadFuncs', 'RexxUtil', 'SysLoadFuncs'
+call SysLoadFuncs
+
+dialer      = 'c:\tcpip\bin\dialer.exe'
+dialerClose = dialer '-c'
+comPort     = 'com3'
+
+TRACE('')
+
+parse source . . compCmdName
+cmdName = filespec('name',compCmdName)
+tmpDir  = value('tmp',,'os2environment')
+
+lockFile = ''
+IF tmpDir = '' THEN
+    SAY 'please define %TMP% for locking' CmdName
+ELSE DO
+    lockFile = tmpDir || '\logout.sem'
+    if stream( lockFile,'c','open write') \= 'READY:' then DO
+        SAY CmdName 'already active...'
+        EXIT
+    END
+END
+
+
+if isActive(dialer) then do
+    SAY 'logging off...'
+   '@start /min' dialerClose
+
+   rc = SysSleep( 2 )
+   DO FOREVER
+       IF \isActive(dialer) THEN
+           LEAVE
+       call HangupNow
+       rc = SysSleep( 2 )
+   END
+end
+call HangupNow
+
+IF lockFile \= '' THEN DO
+    rc = stream( lockFile,'c','close' )
+    rc = SysFileDelete( lockFile )
+END
+
+EXIT
+
+
+HangupNow:
+'@mode' comPort || ',dtr=on  > nul'
+'@mode' comPort || ',dtr=off > nul'
+'@mode' comPort || ',dtr=on  > nul'
+RETURN
+
+
+isActive: PROCEDURE
+prog = ARG(1)
+
+'@pstat /c | RXQUEUE'
+
+prog = TRANSLATE(prog)
+found = 0
+DO ii = 1 TO queued()
+    PULL line
+    IF POS(prog,TRANSLATE(line)) \= 0 THEN do
+        found = 1
+        LEAVE
+    END
+END
+RETURN found
+
+
+77..22  OOwwnnSSoouupp
+----------------------
+
+OwnSoup, with the help of the YYaarrnn iimmppoorrtt program, redirects news
+articles matching a specific pattern into a mail folder.  OwnSoup
+can be seen as a notification program to allow easy tracking of news
+threads you are involved in.
+
+
+SSyynnttaaxx
+------------
+
+oowwnnssoouupp [[--hh]] [[--bb]] [[--qq]] _<_p_a_t_t_e_r_n_> _<_g_r_o_u_p_n_a_m_e_> _<_o_u_t_p_u_t_f_i_l_e_>
+
+where
+
+[[--hh]]    search for _<_p_a_t_t_e_r_n_> in header of article only,
+
+[[--bb]]    search for _<_p_a_t_t_e_r_n_> in body of article only.  The subject
+        line of the header is considered to be part of header and
+        body.
+
+        If --hh or --bb is not specified the default is to search the
+        complete article,
+
+[[--qq]]    be quiet.  Only the number of matches found will be displayed,
+
+_<_p_a_t_t_e_r_n_>
+        is your search pattern which should be defined according to
+        the regular expression syntax,
+
+_<_g_r_o_u_p_n_a_m_e_>
+        is a dummy groupname to allow easy filtering.  All the
+        matching articles will contain the header line XX--oowwnnssoouupp::
+        _<_g_r_o_u_p_n_a_m_e_>,
+
+_<_o_u_t_p_u_t_f_i_l_e_>
+        is the name of the temporary outputfile (the ..MMSSGG-extension
+        will be added by OwnSoup).
+
+The generated _<_o_u_t_p_u_t_f_i_l_e_> will be registered in the ..\\AARREEAASS
+file, thus iimmppoorrtt will also find the _<_o_u_t_p_u_t_f_i_l_e_>.  Note that the
+_<_o_u_t_p_u_t_f_i_l_e_> will be deleted after the iimmppoorrtt so that the actual name
+you choose is almost unimportant.
+
+
+
+EExxaammppllee  SSeettuupp  ooff  OOwwnnSSoouupp
+------------------------------------------------
+
+- Assuming a script is used when importing news, directly before
+  iimmppoorrtt is called, a line calling OwnSoup is placed in the script.
+  This would be something like:
+
+    ownsoup rgriech stuff4me OwnTemp
+
+  This example would search for ""rrggrriieecchh"" in the header and body
+  sections of each message, writing matching messages to an output
+  file called OwnTemp after marking them with
+
+    X-ownsoup: stuff4me
+
+  The YYaarrnn iimmppoorrtt can now easily filter out any such news articles
+  and put them in a mail folder which in this example we will call
+  ""PPeerrssoonnaall"".
+
+  The search pattern here is ""rrggrriieecchh"" but a more complex pattern
+  could be used, for example I could search on a pattern of
+  ""rrggrriieecchh||hhaarrddyy..ggrriieecchh"" which would find either my EMail name or
+  my full name.  The '.' wildcard is used in place of a space.  The
+  pattern must be in quotes because of the '|' character.
+
+  Note that because no --hh or --bb parameter is set, OwnSoup will search
+  both the header and the body of all messages.
+
+  If you are using YarnIo, OwnSoup would be called by setting the
+  pprreeIImmppoorrttPPrroogg line in YARNIO.SET.  Our example would require the
+  following:
+
+    preImportProg = 'ownsoup rgriech stuff4me OwnTemp'
+
+- To setup a YYaarrnn filter which moves all the messages matching the
+  pattern ""XX--oowwnnssoouupp:: ssttuuffff44mmee"" into the mail folder ""PPeerrssoonnaall"" you
+  would do the following:
+
+  Set up a filter using the YYaarrnn FFIILLTTEERR..EEXXEE program.  When run, this
+  shows a box for details, which you would complete as follows:
+
+  Ú Mail Rule ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³                                                                          ³
+  ³  Rule name: MentionsMe                                                   ³
+  ³                                                                          ³
+  ³  Search in: ( ) From                                                     ³
+  ³             ( ) To                                                       ³
+  ³             ( ) Subject                                                  ³
+  ³             (*) Header                                                   ³
+  ³             ( ) Body                                                     ³
+  ³             ( ) Header and body                                          ³
+  ³                                                                          ³
+  ³ Search for: X-ownsoup: stuff4me                                          ³
+  ³ Match case: No                                                           ³
+  ³                                                                          ³
+  ³     Action: (*) Move to folder/newsgroup: Personal                       ³
+  ³             ( ) Delete                                                   ³
+  ³                                                                          ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+  In the ""SSeeaarrcchh ffoorr"" line above, ""XX--oowwnnssoouupp:: ssttuuffff44mmee"" represents
+  the string you wish to search for, i.e. the string that OwnSoup
+  puts in when it finds a match on its own search and ""PPeerrssoonnaall""
+  represents the name you wish the new mail folder to have.
+
+  Note that YYaarrnn's filter now only needs to search the header as it
+  is only looking for the ""XX--oowwnnssoouupp:: ssttuuffff44mmee"" line.
+
+  After this preparation all incoming news articles will be checked
+  for _<_p_a_t_t_e_r_n_> as set in OwnSoup (in this case ""rrggrriieecchh""), and
+  matching articles will be moved into the ""PPeerrssoonnaall"" mail folder.
+
+- Of course, you can set up more than one filter and if you wish you
+  could put the output in different mail folders.
+
+
+RReessttrriiccttiioonn
+----------------------
+
+Do not set up ""PPeerrssoonnaall"" as a newsgroup, because YYaarrnn would skip the
+filtered articles in this case due to the MMeessssaaggee--IIDD::.
+
+
+OOtthheerrss
+------------
+
+- Articles filtered to ""PPeerrssoonnaall"" can be rreepplliieedd and ffoolllloowweedd uupp.
+
+- OwnSoup scans all files contained in ..\\AARREEAASS matching the SSOOUUPP
+  formats ""bb"" and ""uu"", i.e. files containing news articles.  The
+  generated file has the binary 8-bit clean mail SSOOUUPP format (""bbnn"").
+
+
+77..33  QQSSoouupp
+------------------
+
+QSoup (pronounce 'queue soup') appends mail and news messages to the
+YYaarrnn _r_e_p_l_y _p_a_c_k_e_t file for transmission by VVSSoouupp.  The messages must
+contain all required header fields, i.e. QSoup does not manipulate
+the content of the message, except that it does '\r' stripping and
+interpretes ^Z as end of message.
+
+
+SSyynnttaaxx
+------------
+
+qqssoouupp [[--mm]] [[--vv]] [[--ii]] [[--hh_<_d_i_r_>]] [[--ll_<_f_i_l_e_>]] [[_<_i_n_p_u_t_f_i_l_e_>]]
+
+where
+
+[[--mm]]    the message input to QSoup is a mail, default is news,
+
+[[--vv]]    be verbose,
+
+[[--ii]]    ignore all options coming behind the _<_-_i_>.  This is useful,
+        if the calling program appends command line arguments which
+        are not known by QSoup,
+
+[[--rr_<_f_i_l_e_>]]
+        set the name of the _r_e_p_l_y _p_a_c_k_e_t to _<_f_i_l_e_>.  Default is to
+        read the name of the _r_e_p_l_y _p_a_c_k_e_t from %%HHOOMMEE%%\\YYAARRNN\\CCOONNFFIIGG in
+        the line rreeppllyy--ppaacckkeett,
+
+[[--ll_<_f_i_l_e_>]]
+        use _<_f_i_l_e_> as the lock file for access control to the _r_e_p_l_y
+        _p_a_c_k_e_t.  Default is to use %%YYAARRNN%%\\HHIISSTTOORRYY..PPAAGG,
+
+[[_<_i_n_p_u_t_f_i_l_e_>]]
+        is the name of the message file.  If omitted, the message
+        will be read from stdin, thus allowing to connect the message
+        provider and QSoup through a pipe.
+
+
+
+EExxaammppllee  SSeettuupp  OOff  QQSSoouupp  AAnndd  SSeennddmmaaiill
+----------------------------------------------------------------------
+
+Using sseennddmmaaiill has several advantages.  First, it is a standard
+tool which is used by many programs for mail delivery (e.g. LLyynnxx).
+Second, it is very flexible and allows routing of messages depending
+on their recipients address.  The second point is also the weakest
+point of sseennddmmaaiill: it is hard to configure.
+
+This example shows my setup of sseennddmmaaiill.  But be warned: I am no
+sseennddmmaaiill expert and to get this configuration running was a lot of
+fiddling!
+
+My changes to the standard configuration were as follows:
+
+- take the original sseennddmmaaiill..uummll from Warp Connect and copy it to
+  %%EETTCC%%\\sseennddmmaaiill..ccff,
+
+- insert the following two lines in the very beginning of sseennddmmaaiill..ccff:
+
+    Cwworkstationname.domain
+    Dwworkstationname.domain
+
+- change the OOQQ setting so it reflects the subdirectory of your mail
+  queue (which in fact should not be required, because the mails are
+  received by QSoup immediately),
+
+- set the HH??FF??FFrroomm:: field to your EMail address.  This will be the
+  default address, if nothing else is specified in the FFrroomm::-header
+  of the message,
+
+- in the RRuulleesseett 00 at the end of the first section specify the rule
+
+    R$+<@$+>              $#local $:$1
+
+  This will instruct sseennddmmaaiill to direct all mails to the local mailer
+  program.  Note that the blanks between the >> and the $$ have to be
+  tabs,
+
+- change the local mailer program, so that it shows the following:
+
+    Mlocal, P=d:\b\32\qsoup.exe , F=lmnDFM, S=10, R=0, A=-m -i $u
+
+  You have to replace the dd::\\bb\\3322 with the actual QSoup path.  If
+  this path is not correct, sseennddmmaaiill will not deliver the mails!
+
+After you have done the setup, you should check it with a dummy
+mail.  Type in the following:
+
+  sendmail -t
+  --->IBM OS/2 SENDMAIL VERSION 1.3.17
+  --->reading ...\sendmail.cf 10
+  to: dummy@x.y.z
+  subject: sendmail/qsoup testing
+
+  Hello
+  ^Z                    (this is a ctrl-Z!)
+  --->11/09/96 19:01:03 mail delivered from:  YourName
+
+Now you can check the successful delivery with the command uunnzziipp --CCpp
+--aaaa rreeppllyy--ppaacckkeett mmaaiill..mmssgg.  The output should be something like that:
+
+  Received: by ibm.net (IBM OS/2 SENDMAIL VERSION 1.3.17/2.12um) id AA3986; ...
+  Date: Sat, 09 Nov 96 18:59:40 +0100
+  From: YourName
+  Message-Id: <9611091759.AA3986@ibm.net>
+  To: dummy@x.y.z
+  Subject: sendmail/qsoup testing
+
+  Hello
+
+Note, that sseennddmmaaiill inserted the missing DDaattee::, FFrroomm:: and MMeessssaaggee--IIdd::
+header lines (the redundant header RReecceeiivveedd:: too).  YYoouurrNNaammee should
+show the correct settings.
+
+After successful test you should delete the reply packet file.  For
+the actual 'diff' of my sseennddmmaaiill..ccff and sendmail.umf see also the FAQ.
+
+
+
+MMiisscceellllaanneeoouuss
+--------------------------
+
+- If you are using QSoup as a sseennddmmaaiill mailer program you can not
+  setup sseennddmmaaiill as the MMAAIILLEERR of VVSSoouupp (see environment settings).
+
+  First, this would result in a deadlock during transmit action of
+  VVSSoouupp, because the invoked sseennddmmaaiill would invoke an instance of
+  QSoup, which could not proceed, because the YYaarrnn _r_e_p_l_y _p_a_c_k_e_t would
+  be held by the transmitting VVSSoouupp.
+
+  Second, this would not be a meaningful configuration, because the
+  mail would loop endlessly in your computer without being ever
+  transmitted to the external world.
+
+  If other programs require the MMAAIILLEERR environment variable pointing
+  to sseennddmmaaiill and if sseennddmmaaiill is configured to deliver mails to
+  QSoup, one should clear MMAAIILLEERR prior to the ""VVSSoouupp --ss"" call.  For
+  YarnIo operation this could be done in YARNIO.SET.
+
+- Because QSoup has to unzip/zip the _r_e_p_l_y _p_a_c_k_e_t, do not expect fast
+  operation.  Anyway appending a message to the _r_e_p_l_y _p_a_c_k_e_t will be
+  much faster than the actual delivery to the network.
+
+- If QSoup is copied to an executable with the name sseennddmmaaiill
+  (SSEENNDDMMAAIILL..EEXXEE) and is invoked as sseennddmmaaiill, QSoup mode defaults to
+  'get a mail from stdin'.  If QSoup is copied to an executable with
+  the name iinneewwss (IINNEEWWSS..EEXXEE) and is invoked as iinneewwss, QSoup mode
+  defaults to 'get a news article from stdin'.
+
+  All command line options will be ignored in either case.  Keep in
+  mind, that the messages must contain all required header fields.
+
+- The exact access criteria for _r_e_p_l_y _p_a_c_k_e_t access are as follows:
+
+  1.  Set %%YYAARRNN%%\\HHIISSTTOORRYY..PPAAGG to writable without access sharing.
+      This operation must be accomplished successfully.
+      %%YYAARRNN%%\\RREEPPLLIIEESS is the default lock file which can be overridden
+      by the --ll_<_f_i_l_e_> option.
+
+  2.  The RREEPPLLIIEESS file in the _r_e_p_l_y _p_a_c_k_e_t subdirectory must not
+      exist.
+
+  Criterion (1) blocks QSoup, if YYaarrnn is active.  Also this works
+  like a semaphor and prevents multiple instances of QSoup to access
+  the _r_e_p_l_y _p_a_c_k_e_t.  Criterion (2) prevents QSoup from accessing the
+  _r_e_p_l_y _p_a_c_k_e_t if it is unzipped, e.g. during ""VVSSoouupp --ss"".
+
+  Don't forget that an open YYaarrnn or an active ""VVSSoouupp --ss"" blocks
+  QSoup.  This means, as long as another application accesses either
+  the lloocckkffiillee or the YYaarrnn _r_e_p_l_y _p_a_c_k_e_t, QSoup can not perform the
+  requested operation.
+
+
+77..44  CCoonnvvSSoouupp
+------------------------
+
+ConvSoup is a small program which converts the VVSSoouupp SSOOUUPP output
+files, which are in binary format (""bbnn"" & ""BBnn"") into UUNNIIXX mailbox
+format (""mmnn"") and UUSSEENNEETT batch format (""uunn"") respectively.  The
+output files are written with '\n' as line separator.
+
+ConvSoup must be started in the subdirectory that contains the
+..\\AARREEAASS and the ..\\**..MMSSGG files.
+
+ConvSoup is useful for people who wants to use VVSSoouupp with offline
+newsreader which do not recognize VVSSoouupp's packet format directly.
+Although VVSSoouupp complies to SSOOUUPP, some readers only know about UUNNIIXX
+mailbox and UUSSEENNEETT batch format.  E.g.  CChhaannggii's RRNNeewwss expects UUSSEENNEETT
+batch format on its input.
+
+
+77..55  MMooddiiffyyEEmmxxHH
+----------------------------
+
+This script is of interest for people who wants to compile VVSSoouupp on
+their own.  MMOODDIIFFYYEEMMXXHH..CCMMDD is required for multiple inclusion of the
+ooss22..hh and ooss22eemmxx..hh header files.
+
+MMOODDIIFFYYEEMMXXHH..CCMMDD reads form stdin and copies to stdout.  Keep in
+mind, that multiple inclusion of the above mentioned headers is not
+standard.  It is just for my convenience.
+
+
+77..66  RRmmHHiigghh
+--------------------
+
+RRMMHHIIGGHH..CCMMDD removes the highlighting from VVSSOOUUPP..TTXXTT.  This is useful
+for people who wants to read the documentation in text mode and have
+no pager or editor available which understands the poor (wo)mans
+highlighting used in VVSSOOUUPP..TTXXTT.
+
+GGNNUUs LLeessss is an example of a pager that handles the distributed
+VVSSOOUUPP..TTXXTT correctly.
+
+
+88  FFiilleess
+==============
+
+This section describes all the input and output files used
+and generated by VVSSoouupp in detail.  Under normal circumstances
+%%HHOOMMEE%%\\NNEEWWSSRRCC and %%HHOOMMEE%%\\SSCCOORREE are the only files of interest.  For
+description of YarnIo files, see the YarnIo section.
+
+
+88..11  TThhee  NNeewwssrrcc  FFiillee
+--------------------------------------
+
+%%HHOOMMEE%%\\NNEEWWSSRRCC contains the list of newsgroups.
+
+':'     behind the name indicates subscribed group,
+
+'!'     indicates an unsubscribed one.
+
+The list of newsgroups can be obtained from the news server by using
+the --aa option of VVSSoouupp (see FAQ) or can be prepared with a text
+editor as follows:
+
+List the newsgroups you want to receive, one per line, and end each
+line with a colon.  For example:
+
+  comp.answers:
+  news.answers:
+  rec.humor.funny:
+
+VVSSoouupp will keep track of fetched articles by recording the article
+numbers in this file.
+
+
+
+SSyynnttaaxx
+------------
+
+For anyone who really wants to know, the syntax of the file is as
+follows:
+
+%%HHOOMMEE%%\\NNEEWWSSRRCC ::::== _<_l_i_n_e_s_>
+
+_<_l_i_n_e_s_> ::::== _<_l_i_n_e_> _<_l_i_n_e_s_> || eemmppttyy
+
+_<_l_i_n_e_> ::::== _<_g_r_o_u_p_n_a_m_e_> _<_s_e_p_> _<_a_r_t_i_c_l_e_-_r_a_n_g_e_s_> ""\\nn""
+
+_<_s_e_p_> ::::== ""!!"" || ""::""
+
+_<_a_r_t_i_c_l_e_-_r_a_n_g_e_s_> ::::== _<_a_r_t_i_c_l_e_-_r_a_n_g_e_s_> "",,"" _<_a_r_t_-_r_a_n_g_e_> || _<_a_r_t_-_r_a_n_g_e_> 
+
+_<_a_r_t_-_r_a_n_g_e_> ::::== "" "" _<_a_r_t_-_n_u_m_> || "" "" _<_a_r_t_-_n_u_m_> ""--"" _<_a_r_t_-_n_u_m_> 
+
+_<_g_r_o_u_p_n_a_m_e_> is the name of a group, _<_a_r_t_-_n_u_m_> is a long integer.
+_<_a_r_t_i_c_l_e_-_r_a_n_g_e_s_> must be sorted in ascending order to be recognized
+correctly.  Blanks are only allowed at the indicated positions.
+
+Under normal circumstances, only the _<_s_e_p_> is important to the user
+for subscribing and unsubscribing groups.
+
+
+88..22  TThhee  SSccoorree  FFiillee
+------------------------------------
+
+The score file specifies criteria used to exclude articles from the
+VVSSoouupp packet.  You can kill articles that have a specific subject,
+are from a specific poster, or contain a particular string anywhere
+in the header.  Even killing of articles which do nnoott contain a
+specific pattern in their header is possible with scoring.
+
+%%HHOOMMEE%%\\SSCCOORREE is the default score file.  The name and subdirectory
+of the score file can be configured by specifying the --KK_<_s_c_o_r_e_f_i_l_e_>
+command line option.  This allows one single score file for all news
+servers you wish to access.
+
+An entry in the score file, also called _<_s_c_o_r_e_-_s_e_c_t_i_o_n_>, has the
+format:
+
+_<_s_c_o_r_e_-_g_r_o_u_p_> ""{{""
+    _<_s_c_o_r_e_-_r_u_l_e_>
+           ......
+""}}""
+
+with _<_s_c_o_r_e_-_r_u_l_e_> being one of the following alternatives:
+
+1.  _<_s_c_o_r_e_> ""lliinneess"" "">>"" _<_n_u_m_b_e_r_>
+
+2.  _<_s_c_o_r_e_> ""lliinneess"" ""<<"" _<_n_u_m_b_e_r_>
+
+3.  _<_s_c_o_r_e_> ""ppaatttteerrnn"" ""hheeaaddeerr"" _<_r_e_g_-_e_x_p_>
+
+4.  _<_s_c_o_r_e_> ""ppaatttteerrnn"" _<_w_h_e_r_e_> _<_r_e_g_-_e_x_p_>
+
+5.  _<_s_c_o_r_e_> ""hheeaaddeerr"" _<_s_t_r_i_n_g_>
+
+6.  _<_s_c_o_r_e_> _<_w_h_e_r_e_> _<_s_t_r_i_n_g_>
+
+_<_s_c_o_r_e_-_r_u_l_e_>s 11.. and 22.. are for scoring of the article length, 33..
+and 44.. are both working with regular expressions (_<_r_e_g_-_e_x_p_>), 55..
+and 66.. are working with literal strings (_<_s_t_r_i_n_g_>).  33.. and 55.. are
+scanning the complete header for the corresponding patterns, 44.. and
+66..  are matching its pattern only in the corresponding header line
+_<_w_h_e_r_e_>.
+
+
+
+DDeessccrriippttiioonn  ooff  tthhee  ssccoorree--sseeccttiioonn  eelleemmeennttss
+----------------------------------------------------------------------------------
+
+_<_s_c_o_r_e_-_g_r_o_u_p_>
+        _<_s_c_o_r_e_-_g_r_o_u_p_> is a regular expression.  The contained
+        _<_s_c_o_r_e_-_r_u_l_e_>s are applied to newsgroups which are matched
+        by the _<_s_c_o_r_e_-_g_r_o_u_p_> regular expression completely.  If
+        _<_s_c_o_r_e_-_g_r_o_u_p_> is the string ""aallll"", the _<_s_c_o_r_e_-_r_u_l_e_>s are
+        applied to all newsgroups.
+
+_<_s_c_o_r_e_-_r_u_l_e_>
+        see above.
+
+_<_s_c_o_r_e_>
+        is the score which has been assigned to the _<_s_c_o_r_e_-_r_u_l_e_>.
+        All scores of _<_s_c_o_r_e_-_r_u_l_e_>s matching an articles header are
+        added up and then compared to the _<_k_i_l_l_-_t_h_r_e_s_h_o_l_d_>.  If the
+        total score is less than the _<_k_i_l_l_-_t_h_r_e_s_h_o_l_d_>, the article is
+        killed.
+
+_<_w_h_e_r_e_>
+        specifies where to search in the header.  ffrroomm searches the
+        FFrroomm:: line, ssuubbjjeecctt searches the SSuubbjjeecctt:: line and so on.
+        The special _<_w_h_e_r_e_>-pattern ""hheeaaddeerr"" searches all the lines
+        in the header of the article.
+
+_<_r_e_g_-_e_x_p_>
+        is the string in form of a regular expression to search for.
+
+_<_s_t_r_i_n_g_>
+        is the literal string to search for.
+
+_<_n_u_m_b_e_r_>
+        is a line number to which the actual article length is
+        compared.
+
+
+
+SSppeecciiaall  ssccoorree--sseeccttiioonnss
+--------------------------------------------
+
+There are two special _<_s_c_o_r_e_-_s_e_c_t_i_o_n_>s:
+
+""qquuiitt""  stops reading of the score file immedialtely.
+
+""kkiilllltthhrreesshhoolldd"" _<_k_i_l_l_-_t_h_r_e_s_h_o_l_d_>
+        sets the threshold for killing articles, i.e. the lowest
+        limit articles should fulfill to not being killed.  The
+        threshold is global (i.e. applies to all groups and rules)
+        and the last occurance of ""kkiilllltthhrreesshhoolldd"" counts.
+
+Lines beginning with a '#' in the first non-blank position are
+treated as comments.
+
+
+
+RReemmaarrkkss
+--------------
+
+- All fields are case-insensitive.
+
+- After ""hheeaaddeerr"" and _<_w_h_e_r_e_> a colon (""::"") is allowed.
+
+- News transmission speed decreases if a score file is used, because
+  an article is fetched then in two steps: HHEEAADD <<nnuumm>>, then BBOODDYY
+  <<nnuumm>>.  Otherwise an article will be fetched in only one single
+  step: AARRTTIICCLLEE <<nnuumm>>.  Offline-Scoring of YYaarrnn is also more flexible
+  than this online-scoring because you can change your mind about the
+  scores aafftteerr reception of the articles!
+
+- It is pretty legal to break the scoring criteria of several
+  _<_s_c_o_r_e_-_g_r_o_u_p_>s in several _<_s_c_o_r_e_-_s_e_c_t_i_o_n_>s.
+
+- If ""hheeaaddeerr""--_<_s_c_o_r_e_-_r_u_l_e_>s are applied, the pattern is searched for
+  in the complete header, i.e. one can also match specific header
+  fields.
+
+- The _<_s_c_o_r_e_-_g_r_o_u_p_> ""aallll"" is transformed to the regular expression
+  ""..**"".
+
+- Although the ""..""s in newsgroup names are meta characters
+  of regular expressions this should not do any harm to
+  'normal' group matching.  E.g.  the _<_s_c_o_r_e_-_g_r_o_u_p_> expression
+  ""ccoommpp..ooss..ooss22..pprrooggrraammmmeerr..mmiisscc"" will match only one group in real
+  life.
+
+- The score file works on news only.
+
+- Check the FAQ for example score files.
+
+
+
+SSyynnttaaxx
+------------
+
+The exact syntax of the score file is as follows:
+
+%%HHOOMMEE%%\\SSCCOORREE ::::== {{_<_l_i_n_e_> ""\\nn""}}_*
+
+_<_l_i_n_e_> ::::== ''##'' _<_t_e_x_t_> || _<_s_c_o_r_e_-_s_e_c_t_i_o_n_>
+
+    Lines beginning with a '#' indicates a comment, _<_t_e_x_t_> indicates
+    literal strings.
+
+_<_s_c_o_r_e_-_s_e_c_t_i_o_n_> ::::== ""aallll"" ""{{"" _<_s_c_o_r_e_-_r_u_l_e_s_> ""}}"" 
+                 || _<_s_c_o_r_e_-_g_r_o_u_p_> ""{{"" _<_s_c_o_r_e_-_r_u_l_e_s_> ""}}"" 
+                 || ""kkiilllltthhrreesshhoolldd"" _<_n_u_m_b_e_r_> 
+                 || ""qquuiitt"" 
+
+    ""aallll"" indicates, that the following _<_s_c_o_r_e_-_r_u_l_e_s_> is valid for
+    all newsgroups, The regular expression _<_s_c_o_r_e_-_g_r_o_u_p_> limits the
+    _<_s_c_o_r_e_-_r_u_l_e_s_> to specific newsgroups.
+
+_<_s_c_o_r_e_-_r_u_l_e_s_> ::::== _<_s_c_o_r_e_-_r_u_l_e_> ""\\nn"" {{_<_s_c_o_r_e_-_r_u_l_e_s_>}}
+
+_<_s_c_o_r_e_-_r_u_l_e_>  ::::== _<_s_c_o_r_e_> ""lliinneess"" "">>"" _<_n_u_m_b_e_r_> 
+            || _<_s_c_o_r_e_> ""lliinneess"" ""<<"" _<_n_u_m_b_e_r_> 
+            || _<_s_c_o_r_e_> ""ppaatttteerrnn"" ""hheeaaddeerr"" _<_r_e_g_-_e_x_p_> 
+            || _<_s_c_o_r_e_> ""ppaatttteerrnn"" _<_w_h_e_r_e_> _<_r_e_g_-_e_x_p_> 
+            || _<_s_c_o_r_e_> ""hheeaaddeerr"" _<_s_t_r_i_n_g_> 
+            || _<_s_c_o_r_e_> _<_w_h_e_r_e_> _<_s_t_r_i_n_g_> 
+
+    _<_s_c_o_r_e_> is a number (the score!), _<_n_u_m_b_e_r_> too, , _<_r_e_g_-_e_x_p_> is a
+    regular expression, _<_w_h_e_r_e_> and _<_s_t_r_i_n_g_> are literal strings.
+
+
+Note:   ""\\nn"" is the newline character.  It is mandatory!
+
+
+88..22..11  RReegguullaarr  eexxpprreessssiioonn  ssyynnttaaxx
+--------------------------------------------------------------
+
+The following description has been taken from the mmaann rreeggeexxpp pages
+(BSD experimental).
+
+A regular expression is zero or more branches, separated by ||.  It
+matches anything that matches one of the branches.
+
+A branch is zero or more pieces, concatenated.  It matches a match
+for the first, followed by a match for the second, etc.
+
+A piece is an atom possibly followed by _*, ++, or ??.  An atom followed
+by _* matches a sequence of 0 or more matches of the atom.  An atom
+followed by ++ matches a sequence of 1 or more matches of the atom.
+An atom followed by ?? matches a match of the atom, or the null string.
+
+An atom is a regular expression in parentheses (matching a match for
+the regular expression), a range (see below), ..  (matching any single
+character), ^^ (matching the null string at the beginning of the input
+string), $$ (matching the null string at the end of the input string),
+a \\ followed by a single character (matching that character), or a
+single character with no other significance (matching that character).
+
+A range is a sequence of characters enclosed in [[]].  It normally
+matches any single character from the sequence.  If the sequence
+begins with ^^, it matches any single character not from the rest of
+the sequence.  If two characters in the sequence are separated by --,
+this is shorthand for the full list of ASCII characters between them
+(e.g. [[00--99]] matches any decimal digit).  To include a literal ]] in
+the sequence, make it the first character (following a possible ^^).
+To include a literal --, make it the first or last character.
+
+
+88..33  OOtthheerr  FFiilleess
+------------------------------
+
+
+..\\CCOOMMMMAANNDDSS
+--------------------
+
+contains lines with the syntax: ''sseennddmmee'' _<_g_r_o_u_p_n_a_m_e_>
+_<_a_r_t_i_c_l_e_-_r_a_n_g_e_s_>.  ..\\CCOOMMMMAANNDDSS is executed instead of standard
+fetching of news (see also News Reception).  After successful
+..\\CCOOMMMMAANNDDSS processing, the file will be deleted.
+
+Note:   articles which have already been read (marked in
+        %%HHOOMMEE%%\\NNEEWWSSRRCC) will be skipped!
+
+
+%%HHOOMMEE%%\\NNEEWWSSTTIIMMEE
+------------------------------
+
+contains the time of the last NNNNTTPP connection.  This is for fetching
+of new newsgroups.  If %%HHOOMMEE%%\\NNEEWWSSTTIIMMEE does not exist, aallll currently
+available newsgroups are fetched from the server when VVSSoouupp was
+called with the --aa option.
+
+
+%%TTMMPP%%\\SSOOUUPP**..TTMMPP
+------------------------------
+
+temporary files for received articles.  _* will be replaced by a
+number in the range 0-9999.  If %%TTMMPP%% is not defined, %%TTMMPP%% will be
+substituted by a '.'
+
+
+
+..\\0000**..MMSSGG
+------------------
+
+contain the received messages (news articles & EMail).  The files are
+written in the following SSOOUUPP formats:
+
+- Binary 8-bit clean news format (""BBnn"") for incoming news.  Lines are
+  delimited by a single '\n',
+
+- Binary 8-bit clean mail format (""bbnn"") for incoming mails.  Lines
+  are delimited by a single '\n'.
+
+Note that the format of the message files can be changed to UUNNIIXX
+mailbox and UUSSEENNEETT batch using ConvSoup.
+
+
+..\\0000**..IIDDXX
+------------------
+
+contain the received newsgroup summaries (--uu option).  The files are
+written in the SSOOUUPP ""iicc"" format.
+
+
+..\\SSTTSSMMAAIILL..MMSSGG
+--------------------------
+
+contains the status message generated by VVSSoouupp11..22..88.  This file is
+written in the SSOOUUPP UUNNIIXX mailbox format (""mmnn"").  Lines are delimited
+by a single '\n'.
+
+
+..\\AARREEAASS
+--------------
+
+contains the table of contents of the received ..\\0000**..MMSSGG / ..\\0000**..IIDDXX
+files (+ ..\\SSTTSSMMAAIILL..MMSSGG).
+
+
+
+..\\NNEEWWSS..MMSSGG
+--------------------
+
+contains the news messages that should be sent to the NNNNTTPP server.
+The following SSOOUUPP formats are supported:
+
+""BB""     Binary 8-bit clean news format.  The files are read in binary
+        mode but transferred in text mode to the NNNNTTPP host,
+
+""uu""     UUSSEENNEETT batch format with the area name ""nneewwss"".  The files are
+        read in binary mode, thus '\r\n' pairs are treated as two
+        characters (this is not according to RFC1036 but according to
+        Soup12.Html).
+
+
+..\\MMAAIILL..MMSSGG
+--------------------
+
+contains the mail messages that should be sent to the SSMMTTPP server.
+The following SSOOUUPP formats are supported:
+
+""bb""     Binary 8-bit clean mail format.  The files are read in binary
+        mode but transferred in text mode to the SSMMTTPP gateway,
+
+""uu""     UUSSEENNEETT batch format with the area name ""mmaaiill"".  The files are
+        read in binary mode, thus '\r\n' pairs are treated as two
+        characters (this is not according to RFC1036 but according to
+        Soup12.Html).
+
+
+..\\RREEPPLLIIEESS
+------------------
+
+contains the table of contents of the ..\\NNEEWWSS..MMSSGG / ..\\MMAAIILL..MMSSGG files
+to be transmitted.  Instead of the above file names other names could
+be used too.
+
+
+99  IInnssuuffffiicciieenncciieess,,  BBuuggss  &&  PPllaannss
+==============================================================
+
+
+IInnssuuffffiicciieenncciieess
+------------------------------
+
+- some cmd options, some files are not compatible with SSoouuppeerr1166
+
+- space allocated from the heap is not freed (debugging...)
+
+- behaviour for news receiving/posting, mail receiving/posting is
+  not symmetrical, i.e. there is no multithreading except for news
+  receiving...  This will be (perhaps) fixed in a future version
+
+  E.g.  start threads for connecting to the hosts for transmission,
+  start a thread for overall transmission, start a thread for
+  overall mail reception.  This all will allow parallel operation of
+  sending/receiving NNTP/POP3/SMTP stuff with one single VVSSoouupp.
+
+- only one single version (for OS/2)
+
+- it is not clear, how to handle '\r\n' pairs in the SSOOUUPP format!
+  Soup12.Html says '\r' should be treated as data, but '\r\n' must
+  be avoided.  In Soup12.Html '\r' are counted just like normal data
+  bytes.
+
+
+BBuuggss
+--------
+
+- version of the eemmxx runtime is not checked!
+
+
+PPllaannss
+----------
+
+- remove bugs & insufficiencies
+
+- more situation dependent return codes
+
+- perhaps more status information on the screen
+
+- perhaps the servers IP address will be added to status messages
+
+- perhaps write Subject: to ..\\SSTTSSMMAAIILL..MMSSGG for mail
+  reception/transmission
+
+- real Bcc: implementation for mailing
+
+
+1100  AAuutthhoorr  &&  AAcckknnoowwlleeddggeemmeennttss
+========================================================
+
+
+AAuutthhoorr
+------------
+
+Hardy GriechErnetstr.  10/177933 LahrGermany
+
+EMail:  rgriech@swol.de
+
+
+
+AAcckknnoowwlleeddggeemmeennttss
+--------------------------------
+
+- FSF for GCC (2.7.2.1 used), EMACS (19.33.1 used),
+
+- Eberhard Mattes for the GCC & EMACS ports to OS/2 and the
+  documentation utility eemmxxddoocc, which made the ..IINNFF-file possible,
+
+- Chin Huang for YYaarrnn and SSoouuppeerr,
+
+- the gamma testers Jim Holcomb, Kay Pyrtek, Phil Crown and Ralph D.
+  Bednarski,
+
+- Barrie Smith for rework on the documentation, for many suggestions
+  about documentation and a lot of proof reading!
+
+- Timo Maier for his excessive help finding the Warp4 related bug
+  which led to system crashes (see history, VVSSoouupp11..22..77).
+
+
+1111  HHiissttoorryy
+====================
+
+
+VVeerrssiioonn  11..22..88  ((119900449977))
+--------------------------------------------
+
+- new features:
+
+  - Scoring introduced, see score file.
+
+- obsolete features:
+
+  - The --ll and --LL command line options are obsoleted by scoring.
+    These options allowed length limitations of articles.
+
+- bug fixes:
+
+  - Small bug in pop3.cc which led to undefined/sick error messages.
+
+- other internal changes:
+
+  - In pop3.cc mails are now no longer blocking the areas-files
+    during mail reception.  Instead incoming mail is copyied into a
+    temporary file.  This is a preparation step to allow simultaneous
+    reception of mail/news.
+
+
+VVeerrssiioonn  11..22..77  ((112200229977))
+--------------------------------------------
+
+- new features:
+
+  - Port specification in URLs is now supported.
+
+  - ..\\SSTTSSMMAAIILL..MMSSGG now contains a DDaattee:: header field.  This allows
+    import of the ..\\SSTTSSMMAAIILL..MMSSGG into a pseudo newsgroup, see also the
+    YYaarrnn ffiilltteerr program.
+
+  - The SSuubbjjeecctt:: header line of ..\\SSTTSSMMAAIILL..MMSSGG now contains also the
+    server names which are relevant for the requested operation.
+
+  - The first 40K of temporary files are kept in memory to reduce HDD
+    access (class TTFFiilleeTTmmpp).
+
+  - National language support (__nnllss__ttoolloowweerr(())) introduced for kill
+    expressions, OwnSoup and hashing.
+
+  - newsgroup names in kill files are now regular expressions.
+
+  - new Option --LL_<_n_> allows specification of minimum article length
+    (see news receiving options).
+
+  - new Option --DD forces deletion of mails on PPOOPP33 server after
+    reception of each mail (see mail receiving options).
+
+  - RmHigh.Cmd added, which removes the highlighting in VVSSOOUUPP..TTXXTT.
+
+- bug fixes:
+
+  - VVSSoouupp crashed some Warp4 systems (trap address 0140:7d4c or
+    0140:7e33).  This was fixed through serializing some C library
+    calls (rreemmoovvee(()), rreennaammee(()), ooppeenn(()), cclloossee(()), rreeaadd(()), wwrriittee(()),
+    llsseeeekk(()) and ffttrruunnccaattee(())).  This problem is most likely device
+    driver related, although nothing specific is known.  Thanks to
+    Timo, Stefan, Nate, Rodney, Soenke, Tero and Teng Thiam for their
+    help in finding the problem.
+
+  - Bug in emxlibcm <= 52 (don't know, what will happen later on):
+    _fd_init() is not threadsafe, i.e. all callers too (open(),
+    socket(), etc).  Perhaps This is the cause of the trap problem
+    above (not verified, rg120297)
+
+  - Incomplete packets are now removed from the SSOOUUPP output.
+    Problems appeared with aborted EMail reception (which writes
+    directly into the SSOOUUPP output and not to a temporary).
+
+  - --TT--11 no longer shows throughput info (see global options).
+
+  - Signals were not initialized for mmttGGeettGGrroouupp(()) with option --SS22.
+
+  - In SSOOUUPP ..\\RREEPPLLIIEESS the types ""bbnn""/""BBnn"" now override the message
+    kind ""mmaaiill""/""nneewwss"", which is required for type ""uu"".
+
+  - handling of ""mm"" and ""uu"" SSOOUUPP format in ..\\RREEPPLLIIEESS corrected (file
+    positioning was wrong).
+
+  - "ok, we've read enough..." now displays correctly.
+
+  - %%-display with --SS11 reading strategy now (more) correct.
+
+  - handling of "\r\n" delimited reply files corrected.
+
+  - files are now opened with SH_DENYWR.
+
+  - missing NNEEWWSSRRCC is no longer fatal (useful for initial setup).
+
+- other internal changes:
+
+  - The threads are no longer killed through DDoossKKiillllTThhrreeaadd(()).
+    Instead, threads are killing themselves (when they are detecting
+    an abort condition) through SSIIGGUUSSRR11.  Sockets are being set to
+    OO__NNOONNBBLLOOCCKK to abort current requests.
+
+  - aasssseerrtt((__hheeaappcchhkk(()) ==== __HHEEAAPPOOKK)) inserted in some places.
+
+  - nnhhaannddlleess(()) aborts after checking 150 handles.
+
+
+VVeerrssiioonn  11..22..55  ((009911119966))
+--------------------------------------------
+
+- Improved Documentation, thanks to Barrie Smith.
+
+  Documentation now in TXT and INF format available, thanks to eemmxxddoocc.
+
+- SSOOUUPP format for iimmppoorrtt has been changed:
+
+  - ..\\SSTTSSMMAAIILL..MMSSGG has format ""mmnn"" (same as before)
+
+  - from PPOOPP33 incoming Mails have format ""bbnn"": binary 8-bit clean
+    mail format.  This allows from headers in the first column of the
+    mail, i.e. mail handling is now transparent (old was ""mmnn"").
+
+  - news have format ""BBnn"": binary 8-bit clean news format (old was
+    ""uunn"")
+
+  To allow the conversion to the old format ConvSoup has been added.
+
+- Added OwnSoup which filters news articles containing a specific
+  pattern into a mail folder.
+
+- Added QSoup to allow injection of messages into the SSOOUUPP reply
+  packet.
+
+- YarnIo changes:
+
+  - YarnIo now only zips the SSEENNDD packets (this is to allow re-edit
+    of the replies).  Received messages are imported via iimmppoorrtt --uu.
+    If you have an older version of YARNIO.SET it must be updated.
+
+  - YarnIo now supports OwnSoup.  To allow operation of OwnSoup the
+    entry pprreeIImmppoorrttPPrroogg has been added to YARNIO.SET.
+
+  - YarnIo now supports up to nine NNNNTTPP servers for news reception
+    and up to nine PPOOPP33 servers for EMail reception.
+
+- --TT--11 disables throughput check completely.
+
+- the _<_k_i_l_l_-_s_e_c_t_i_o_n_> for one _<_g_r_o_u_p_> can now be seperated, e.g. the
+  kill file may now contain several ""aallll"" sections.
+
+- now article ranges are allowed in the sseennddmmee of ..\\CCOOMMMMAANNDDSS.  This
+  is a non-standard SSOOUUPP extension.
+
+- bug fixes:
+
+  - hostname is now fetched through TCP/IP API, no longer from
+    'internet settings'
+
+  - it was possible in --SS22 that during final catchup of articles the
+    connections were changing group assignment on each fetched article
+
+  - catchup did not work as expected.  It sets the %%HHOOMMEE%%\\NNEEWWSSRRCC, so
+    that in any case 'n' articles were read afterwards.  Display now
+    shows groupLo & groupHi
+
+  - ^Z was not recognized correctly for %%HHOOMMEE%%\\NNEEWWSSRRCC & %HOME%\KILL
+
+  - Now again linked dynamically, ths EEMMXX..DDLLLL and EEMMXXLLIIBBCCMM..DDLLLL are
+    required
+
+  - Lines containing a single '.' were aborting EMails, even if the
+    '.' is actually doubled for transfer.  Don't know if this is an
+    SSMMTTPP bug.  Appending a blank behind the '.' helped (i.e. "..  "
+    is actually transferred to the SSMMTTPP server).  For news articles
+    it works without appending the blank.
+
+  - sockets are now opened in text mode, because all the RFCs
+    requires \r\n as a line delimiter.
+
+
+VVeerrssiioonn  11..22  ((006611009966))
+----------------------------------------
+
+- first non-beta release
+
+- more detailed README
+
+- YarnIo enhanced (autodial, disabling specific actions,
+  configuration file, ...)
+
+- some changes/enhancements/extensions in ..\\SSTTSSMMAAIILL..MMSSGG, e.g. command
+  line parameters are contain, important server names too...  (useful
+  for debugging)
+
+- if supported by the NNNNTTPP server, the XHDRs are retrieved to
+  determine holes in the article sequence
+
+- throughput check (-T option) now replaces the old timeout
+  detection.  It is now working for all operations.
+
+- news reading, strategy parameter:
+
+  --SS00     groups are read sequentially, i.e. all threads are fetching
+          articles from only one group
+
+  --SS11     the next group will be accessed, if one thread goes into
+          waiting state - only small modification of the above
+
+  --SS22     it is tried, to keep all threads busy.  I.e.  each thread
+          accesses one dedicated group, groups are read parallel (if
+          there are no more groups to access, the waiting threads are
+          used for parallel reading from one group)
+
+- more robust (but slower) reading of %HOME%\KILL and %%HHOOMMEE%%\\NNEEWWSSRRCC.
+  Because it is slower: clean-up your %%HHOOMMEE%%\\NNEEWWSSRRCC from time to
+  time, if you are using the --aa option
+
+- bug fixes:
+
+  - 'internet connection' settings were never ignored (--ii did not
+    work)
+
+  - some very minor bug fixes for handling of broken connections
+
+  - under some circumstances broken SSMMTTPP connection did not produce
+    an error condition
+
+  - bug in kill file handling fixed (trailing blanks in line were
+    not accepted).  Lines in the kill file can now be outcommented
+    through a '#' as the first non-blank character
+
+  - if getArticle() fails, the according connection will be marked as
+    failed.  This lets VVSSoouupp die gracefully, if single connections
+    are cancelled (by whom?)
+
+  - signal handling changed: VVSSoouupp tries (!) to kill the sub-threads
+
+  - number of file handles provided by eemmxx is now checked
+
+  - now compiled with eemmxx0099cc.  During this 'port' it became obvious,
+    that streams are not appropriate.  Thus all file i/o is done
+    directly via handles (class TFile in mts.cc)
+
+
+VVeerrssiioonn  11..11áá  ((001100999966))
+------------------------------------------
+
+- first public beta
+
+- if NNNNTTPP server knows nothing about DATE command, the internal clock
+  will be taken as a reference (required for --aa cmd option only)
+
+- 'AUTHINFO USER' / 'AUTHINFO PASS' for nntp server implemented
+  (RFC977 extension).  Call VVSSoouupp simply with the nntp-URL
+  nntp://user:passwd@nntpserver
+
+- NNNNTTPP NEXT will only be done, if there is a bigger gap between the
+  articles
+
+- bug in socket.cc ((char)0xff == (int)-1 !!!)
+
+
+VVeerrssiioonn  11..00áá  ((001100889966))
+------------------------------------------
+
+- Program is now named VVSSoouupp.  I am sorry, but the program again
+  requires the eemmxx DLLs (to my opinion no disadvantage, because most
+  of the people will have them anyway).  Also there is no support
+  for Win95 (this was not intended and I am not sorry, but I have no
+  Win95 system - and I am happy about that ;-)
+
+- Program is now multithreaded for news reading.  This gives a speed
+  gain of 200%-500% depending on the overall speed of the connection
+  and the number of threads; on the other hand multiple connections
+  have a communication overhead (i.e. the connections must be
+  established, the groups selected).  Estimated loss is around 5%...
+
+- Return codes are now much more consistent: on failure an
+  EXIT_FAILURE (1) is returned, on success EXIT_SUCCESS (0)
+
+- On failure a status mail is generated.  Most of the console
+  messages are redirected into this status mail.  The generation of
+  the mail can be forced thru cmd option --MM
+
+- If file %%HHOOMMEE%%\\NNEEWWSSTTIIMMEE does not exist, the complete newsgroup list
+  is retrieved from the news server (NNNNTTPP LIST)
+
+- Kill files may have comments ('#' in the first position of a
+  line).  This is very beta...
+
+- Readonly mode is now much more consistent (%%HHOOMMEE%%\\NNEEWWSSTTIIMMEE is not
+  updated, also the sent articles are not deleted)
+
+- the default maximum packet size has been changed to unlimited
+
+- Small bug in %%HHOOMMEE%%\\NNEEWWSSRRCC handling found (firstUnread was wrong
+  sometimes)
+
+- automatic timeout for NNNNTTPP reception
+
+
+1122  FFAAQQ
+============
+
+This sections contains several frequently questions and the
+corresponding answers.  The questions are:
+
+---------------------- 
+
+WWhhyy ddoo II ggeett ssoommeetthhiinngg lliikkee ''00000000000022..mmssgg:: TToooo mmaannyy ooppeenn ffiilleess''??
+
+and the related question
+
+II aamm ggeettttiinngg tthhee mmeessssaaggee ''......nnuummbbeerr ooff tthhrreeaaddss ccuutt......''..  WWhhaatt ddooeess iitt
+mmeeaann??
+
+VVSSoouupp needs a lot of open file handles.  The YarnIo script provides
+these automatically, but if you are not using this script then it is
+recommended that you add the following line to your CCOONNFFIIGG..SSYYSS: SSEETT
+EEMMXXOOPPTT==--hh4400 --cc --nn.  This allows 40 open file handles which should be
+enough.
+
+---------------------- 
+
+WWhhyy iiss mmyy nneewwss rreecceeppttiioonn ggeettttiinngg ssttuucckk ssoommeettiimmeess??
+
+One common reason is that you are using the wrong (too old) version
+of the emx-runtime-DLLs.  Check them with eemmxxrreevv (should show
+revisions >= 50) and update them if required.  Also you have to avoid
+a mixture of eemmxx runtime DLLs.
+
+---------------------- 
+
+AArree tthheerree aannyy ssppeecciiffiicc pprroobblleemmss wwiitthh tthhee ddiiffffeerreenntt vveerrssiioonnss ooff tthhee
+eemmxx rruunnttiimmeess??
+
+Unfortunately there are!  The revision of the runtime DLLs can be
+obtained via the command eemmxxrreevv.  Only the revision numbers of
+eemmxx..ddllll and eemmxxlliibbccmm..ddlll are important for VVSSoouupp.
+
+revision < 40
+        No way, because nothing of the TCP/IP stuff is included in
+        the C library.
+
+revision < 50, >= 40
+        This is not recommended, although it should work because
+        VVSSoouupp serializes most of the calls to the C library.
+        Nevertheless you should use the newest available revision of
+        the eemmxx0099bb runtimes, because there were many changes/bugfixes
+        in the TCP/IP part.
+
+revision = 50 (also > 50)
+        Check the setting of the environment variable TTZZ.  It
+        should/must contain a value which is acceptable for the eemmxx C
+        library.  Otherwise you will get an SYS3175.
+
+        Revisions > 50 will not crash due to incorrect setting of TTZZ,
+        anyway they cannot interprete the variable correctly.
+
+---------------------- 
+
+II ccaannnnoott rreecceeiivvee EEMMaaiill ffrroomm mmyy PPOOPP33 sseerrvveerr??
+
+- Check, if your UserId/Password settings are ok
+
+- Check, that your %%EETTCC%%\\SSEERRVVIICCEESS file contains the following lines
+  (see also Installation):
+
+    pop3        110/tcp       #Post Office Protocol - Version 3
+    pop3        110/udp       #Post Office Protocol - Version 3
+
+- Alternatively you can insert the port number in the command line
+  PPOOPP33 URL.
+
+---------------------- 
+
+II hhaavvee aannootthheerr EEMMaaiill pprrooggrraamm.. TThheerreeffoorr II''dd lliikkee ttoo ddiissaabbllee tthhee
+RRCCVVMMAAIILL ffeeaattuurree ooff YYaarrnnIIOO..  HHooww ddoo II ddoo tthhiiss??
+
+You simply have to set ssoouuppRRccvvMMaaiill in YARNIO.SET to '' (the empty
+string).
+
+---------------------- 
+
+GGiivvee mmee ssaammppllee ssccrriippttss ffoorr ssiimmppllee VVSSoouupp IIOO ooppeerraattiioonn..
+
+Simple Reception:
+        Because this is a simple approach, NNEEWWSSRRCC & SSCCOORREE resides in
+        the %%HHOOMMEE%% directory.
+
+        -   change to a directory for IO operation, e.g. cc::\\vvssoouupp.
+
+        -   call VVSSoouupp, e.g.
+
+          vsoup -M nntp://your.news.server pop3://your.pop3.server
+
+          The output of the VVSSoouupp operation will be in the current
+          directory, i.e. in cc::\\vvssoouupp in this example.  If your
+          'internet settings' are setup correctly by your dialer, you
+          could omit the nnnnttpp:://// and ppoopp33:://// specifications in the
+          command line.
+
+        -   feed the received news/EMails and the by VVSSoouupp generated
+          status mail into the database of your newsreader.  For YYaarrnn
+          the iimmppoorrtt program will be used (e.g. iimmppoorrtt --uu).
+
+        If you are using different programs for handling news/EMails,
+        you could do two sequential invocations of VVSSoouupp:
+
+        vsoup -Mm nntp://your.news.server
+        handle_news_import
+        vsoup -Mn pop3://your.pop3.server
+        handle_mail_import
+
+        Of course this VVSSoouupp instances could also be started parallel
+        through e.g.:
+
+        start do_news_reception
+        start do_mail_reception
+
+        This approach requires a little bit more effort than the
+        sequential one.  Check YarnIo as an example.
+
+Simple Transmission:
+
+        -   change to the directory where your reply packets (e.g.
+          rreeppllyy..zziipp) reside.  If they are zipped (or packed in
+          another way), you have to unzip/unpack them before VVSSoouupp
+          will be called (e.g. uunnzziipp --ooqq rreeppllyy..zziipp && ddeell rreeppllyy..zziipp).
+
+        -   call VVSSoouupp, e.g.
+
+          vsoup -Ms nntp://your.news.server smtp://your.mail.gateway
+
+          Failure of transmission should be handled in a proper way,
+          e.g. if ..\\RREEPPLLIIEESS still exists, you have to rezip the not
+          transmitted news/mails (for YYaarrnn IO you have to invoke
+          zziipp --00mm rreeppllyy..zziipp rreepplliieess nneewwss..mmssgg mmaaiill..mmssgg).  If your
+          'internet settings' are setup correctly by your dialer, you
+          could omit the nnnnttpp:://// and ssmmttpp:://// specifications in the
+          command line.
+
+        -   handle the by VVSSoouupp generated status mail (e.g. iimmppoorrtt --uu
+          for YYaarrnn IO).
+
+        If you are using different programs for handling news/mail,
+        you could do two sequential invocations of VVSSoouupp or you could
+        start two VVSSoouupp parallel (see above).
+
+
+IIOO  ffoorr  YYaarrnn  wwiitthh  ssiimmppllee  ssccrriippttss
+--------------------------------------------------------------
+
+We assume, that the IO subdirectory is at cc::\\vvssoouupp, the news/EMail
+reader/writer is YYaarrnn and the server URLs are taken from the
+'internet settings', a status mail is generated by VVSSoouupp, the reply
+packet is stored by YYaarrnn to cc::\\vvssoouupp\\rreeppllyy..zziipp, the NNEEWWSSRRCC & SSCCOORREE
+(if one exists) are located in %%HHOOMMEE%%:
+
+Script for simple reception:
+
+        c:
+        cd \vsoup
+        vsoup -M
+        import -u
+
+Script for simple transmission:
+
+        c:
+        cd \vsoup
+        unzip -oq reply
+        del reply.zip
+        vsoup -Ms
+        import -u
+        zip -0m reply replies news.msg mail.msg
+
+---------------------- 
+
+VVSSOOUUPP..TTXXTT ccoonnttaaiinnss ssttrraannggee cchhaarraaccaatteerrss..  WWhhaatt''ss wwrroonngg??
+
+VVSSOOUUPP..TTXXTT uses some kind of poor (wo)mans highlighting.  This is
+obtained through backspacing and overwriting in the ASCII file.  Some
+Viewers or Editors are not capable of handling such files correctly
+(GGNNUUs LLeessss can do it).
+
+Solution is to remove the highlighting with the small script RmHigh.
+
+---------------------- 
+
+GGiivvee mmee aann eexxaammppllee ssccoorreeffiillee!!??
+
+Here you are:
+
+  # this is a scorefile for VSoup
+  #
+  all {
+     -1 header microsoft
+     -1 pattern from bill.*gates
+  }
+
+  all {
+     -1 pattern subject make.*money
+     -1 pattern subject \$\$\$
+     -1 x-newsreader forte agent
+  }
+
+  comp.os.os2.mail-news {
+     -1 subject ultimail
+     -1 subject netscape
+     -1 subject help:
+  }
+
+  .*binaries.* {
+     -1 lines < 50
+     -1 lines > 3000
+  }
+
+  comp\..* {
+     -1 lines > 99
+  }
+
+- First group would kill messages in aallll newsgroups which have
+
+  - the word mmiiccrroossoofftt somewhere in the header,
+
+  - or are ffrroomm a guy with a bbiillll-pattern followed somewhere by a
+    ggaatteess pattern,
+
+- Second group would again kill messages in aallll newsgroups which have
+
+  - mmaakkee followed by mmoonneeyy in the ssuubbjjeecctt,
+
+  - or contain three consecutive $$$$$$ in the ssuubbjjeecctt,
+
+  - or contain ffoorrttee aaggeenntt in the xx--nneewwssrreeaaddeerr header line.
+
+- Third group would kill messages in the ccoommpp..ooss..ooss22..mmaaiill--nneewwss group
+  which have ssuubbjjeecctt lines containing the words uullttiimmaaiill, nneettssccaappee or
+  hheellpp::.
+
+- Forth group would kill articles in newsgroups matching
+  ..**bbiinnaarriieess..**, if they contain less than 50 lines or more than 3000
+  lines.
+
+- Fifth group would kill articles in newsgroups matching ccoommpp\\....**,
+  if they contain more than 99 lines.  Note, that the newsgroup
+  ccoommpp..ooss..ooss22..mmaaiill..nneewwss will match both the third and the fifth group!
+
+Also check scorefile explanation and the regular expression syntax.
+
+---------------------- 
+
+HHooww ttoo kkiillll hheeaavviillyy ccrroossssppoosstteedd aarrttiicclleess ((aanndd tthhuuss aavvooiidd ssppaammss vveerryy
+lliikkeellyy))??
+
+Add the following to your score file:
+
+  # this kills articles posted to more then 4 groups
+  #
+  all {
+     -1000 pattern newsgroups ,.*,.*,.*,
+  }
+
+---------------------- 
+
+HHooww ttoo ccoonnvveerrtt mmyy oolldd kkiillll ffiillee ttoo tthhee nneeww ssccoorree ffiillee ffoorrmmaatt??
+
+Two rules (but no script...):
+
+- insert ""--11"" at the beginning of each rule,
+
+- if the pattern on the right side contains a regular expression
+  insert ""ppaatttteerrnn"" behind the ""--11"".
+
+---------------------- 
+
+II hhaavvee 88 ccoonnnneeccttiioonnss rreeqquueesstteedd ffoorr nneewwss rreecceeiivviinngg ((wwiitthh tthhee --tt88
+ooppttiioonn)),, bbuutt tthhee ssttaattuuss mmeessssaaggee ssaayyss tthhaatt oonnllyy 33 tthhrreeaaddss wweerree
+ccoonnnneecctteedd ssuucccceessssffuullllyy.. WWhhaatt''ss wwrroonngg??
+
+Nothing! Sometimes it takes very long to establish a connection
+to the news server which means that VVSSoouupp has finished before all
+requested threads have been connected.  It is also possible that a
+news server might restrict the number of simultaneous connections by
+one user.  I have not heard of this happening, but who knows!
+
+---------------------- 
+
+II aamm ggeettttiinngg mmaaiillss,, wwhhiicchh aaccttuuaallllyy sseeeemmss ttoo bbee nneewwss aarrttiicclleess!!??
+
+You are using OwnSoup somewhere.  If you are using YarnIo for you I/O
+operations, check in YARNIO.SET the pprreeIImmppoorrttPPrroogg line, which should
+either be empty ('') or should contain arguments to match your needs
+(not MMIINNEE as the settings reflect in the sample YARNIO.SET in the
+archive).
+
+---------------------- 
+
+II aamm uussiinngg YYAARRNNIIOO..SSEETT..  HHooww ccaann II sseettuupp mmoorree tthhaann oonnee ffiilltteerr wwiitthh
+OOwwnnSSoouupp??
+
+You have to use the command concatenator in the pprreeIImmppoorrttPPrroogg line of
+YARNIO.SET, e.g.
+
+preImportProg = 'ownsoup -q rgriech stuff4me OwnTemp'
+preImportProg = preImportProg '&& ownsoup -bq vsoup vsoupstuff VsTemp'
+
+This example will search for ""rrggrriieecchh"" in header and body and
+additionally for ""vvssoouupp"" in the body section of the news articles.
+
+In a second step you have to setup the corresponding mail filter with
+the YYaarrnn ffiilltteerr program.
+
+---------------------- 
+
+HHooww ttoo mmoovvee tthhee VVSSoouupp ssttaattuuss mmaaiillss iinnttoo aa ppsseeuuddoo nneewwssggrroouupp??
+
+- create a newsgroup with the YYaarrnn utility nneewwggrroouupp, e.g.
+
+     newgroup VSoupStatus 3
+
+  This will create the group VVSSoouuppSSttaattuuss with three days expiration
+  time.
+
+- Setup a filter with the YYaarrnn ffiilltteerr.  The filter parameters are as
+  follows:
+
+  Ú Mail Rule ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³                                                                          ³
+  ³  Rule name: VSoup Status                                                 ³
+  ³                                                                          ³
+  ³  Search in: ( ) From                                                     ³
+  ³             (*) To                                                       ³
+  ³             ( ) Subject                                                  ³
+  ³             ( ) Header                                                   ³
+  ³             ( ) Body                                                     ³
+  ³             ( ) Header and body                                          ³
+  ³                                                                          ³
+  ³ Search for: vsoupuser                                                    ³
+  ³ Match case: No                                                           ³
+  ³                                                                          ³
+  ³     Action: (*) Move to folder/newsgroup: VSoupStatus                    ³
+  ³             ( ) Delete                                                   ³
+  ³                                                                          ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+From now on the VVSSoouupp status mails are put into the newsgroup
+VVSSoouuppSSttaattuuss.  Because the SSuubbjjeecctt:: header also contains the server
+names, YYaarrnn will automatically sort the status mail/news by action.
+
+---------------------- 
+
+HHooww ddoo II ggeett aa lliissttiinngg ooff aallll aavvaaiillaabbllee nneewwssggrroouuppss??
+
+Delete the file NNEEWWSSTTIIMMEE in the directory of your NNEEWWSSRRCC file and
+call VVSSoouupp with the --aa option the next time.  After that you will get
+a status mail and the available groups are appended to your NNEEWWSSRRCC
+file.  Note that groups already contained in NNEEWWSSRRCC will not appear
+in the status mail.
+
+---------------------- 
+
+HHooww ttoo cclleeaann uupp tthhee NNEEWWSSRRCC ffiillee??
+
+After a while the NNEEWWSSRRCC will contain many unsubscribed groups if
+VVSSoouupp will be called with the --aa option.  You can get rid off those
+unsubscribed groups with the following commands:
+
+   cd 'directory of newsrc'
+   find ":" < newsrc > newsrc.tmp
+   copy newsrc.tmp newsrc
+   del newsrc.tmp
+
+---------------------- 
+
+HHooww ttoo ssuubbssccrriibbee ttoo aa nneewwssggrroouupp??
+
+- Open the NNEEWWSSRRCC file of the NNNNTTPP server you like to add an
+  subscription,
+
+- add the line GGrroouuppYYoouuLLiikkeeTTooSSuubbssccrriibbee:: to the file.
+
+On the next import to YYaarrnn, iimmppoorrtt will add the new group to the
+%%YYAARRNN\\AACCTTIIVVEE file automatically with defaults specified in the
+%%HHOOMMEE%%\\YYAARRNN\\CCOONNFFIIGG file (kkeeeepp and mmaaxx--kkeeeepp entries).  It is not
+required to invoke the YYaarrnn nneewwggrroouupp command.  The new group will
+also appear in the nneewwssggrroouupp sseelleeccttiioonn lleevveell of YYaarrnn.
+
+Keep in mind that there are several NNEEWWSSRRCC files!  Some of them are
+used by VVSSoouupp (especially if you access multiples NNNNTTPP servers),
+others are used by YYaarrnn (i.e. %%HHOOMMEE%%\\YYAARRNN\\NNEEWWSSRRCC).
+
+---------------------- 
+
+HHooww ttoo uunnssuubbssccrriibbee aanndd ddeelleettee aa nneewwssggrroouupp??
+
+- Delete the newsgroup from the corresponding NNEEWWSSRRCC file,
+
+- if you have one single NNEEWWSSRRCC file or multiple NNEEWWSSRRCC files and
+  none of them contains any longer the respective group you could
+  delete the newsgroup from the %%YYAARRNN%%\\NNEEWWSS..DDAATT database with the
+  YYaarrnn rrmmggrroouupp command.
+
+---------------------- 
+
+CCaann II aabboorrtt VVSSoouupp ooppeerraattiioonn ssaaffeellyy??
+
+Yes, it is safe to abort VVSSoouupp by ^C or ^BREAK.  The following takes
+place:
+
+News reception:
+        VVSSoouupp will save the current NNEEWWSSRRCC contents and the articles
+        are stored after the reception of each single article into
+        the corresponding ..\\0000**..MMSSGG file.  The ..\\AARREEAASS file will be
+        left in a proper state for import.
+
+EMail reception:
+        The QUIT command will not be sent to the PPOOPP33 server, which
+        means that the mailbox will not be emptied which again means
+        that when you next call you will get the already received
+        EMails of the aborted VVSSoouupp session again.
+
+News transmission:
+        Double sent articles are detected by the news server and will
+        be rejected by it.  This special type of rejection (435 & 437
+        error number in NNNNTTPP reply) will be considered by VVSSoouupp as a
+        non-error condition, thus the articles are handled as having
+        been successfully delivered (which in fact they are).
+
+EMail transmission:
+        If the VVSSoouupp session has been aborted during EMail
+        transmission, the whole EMail batch will be resent.
+
+---------------------- 
+
+CCaann yyoouu sshhooww mmee tthhee ''ddiiffff'' bbeettwweeeenn yyoouurr sseennddmmaaiill..ccff aanndd tthhee oorriiggiinnaall
+sseennddmmaaiill..uummll??
+
+Of course, but you should be capable of reading 'diffs'.  Also be
+aware, that sseennddmmaaiill requires tabs as delimiter between the ruleset
+fields.
+
+*** sendmail.uml        Tue Oct  3 23:09:04 1995
+--- d:sendmail.cf       Sat Nov  9 19:20:30 1996
+***************
+*** 1,3 ****
+--- 1,7 ----
++ Cwswol.de
++ Dwswol.de
+  #########################################################################
+  #                                                                       #
+  #  Sendmail                                                             #
+***************
+*** 102,108 ****
+  #
+  # If macro R is undefined, then mail for internal destinations will be
+  # delivered directly
+! DDYour.Domain
+
+  # Internal, directly connected domains
+  #
+--- 106,112 ----
+  #
+  # If macro R is undefined, then mail for internal destinations will be
+  # delivered directly
+! DD
+
+  # Internal, directly connected domains
+  #
+***************
+*** 154,160 ****
+  # SMTP read timeout
+  Or15m
+  # Queue directory - this must be changed if TCP/IP is moved!
+! OQC:\MPTN\ETC\mqueue
+  # Always queue for safety
+  Os
+  # Time to live in the queue
+--- 158,164 ----
+  # SMTP read timeout
+  Or15m
+  # Queue directory - this must be changed if TCP/IP is moved!
+! OQd:\ETC\MQUEUE
+  # Always queue for safety
+  Os
+  # Time to live in the queue
+***************
+*** 173,179 ****
+  #
+  HReceived: $?sfrom $s $.by $j ($v/$Z) id $i; $b
+  H?D?Date: $a
+! H?F?From: $q
+  H?M?Message-Id: <$t.$i@$j>
+  H?D?Resent-Date: $a
+  H?F?Resent-From: $q
+--- 177,183 ----
+  #
+  HReceived: $?sfrom $s $.by $j ($v/$Z) id $i; $b
+  H?D?Date: $a
+! H?F?From: Hardy Griech <rgriech@swol.de>
+  H?M?Message-Id: <$t.$i@$j>
+  H?D?Resent-Date: $a
+  H?F?Resent-From: $q
+***************
+*** 297,302 ****
+--- 301,307 ----
+  R$* : $* ;              $#error $@ USAGE $: "list:; syntax illegal for...
+  R<@ $+>                 $#error $@ USAGE $: "user address required"
+  R<$* : $* >             $#error $@ USAGE $: "colon illegal in host name part"
++ R$+<@$+>                $#local $:$1
+
+  # handle numeric address spec
+  R$* < @ [ $+ ] > $*     $#smtp $@ [$2] $: $1 < @ [$2] > $3      numeric...
+***************
+*** 387,393 ****
+  #
+
+  Msmtp,  P=[IPC], F=mDFMuX, S=10, R=0, A=IPC $h
+! Mlocal, P=C:\TCPIP\UMAIL\UMAILER.EXE , F=lsm, S=10, R=0, A=-dest C:\TCP...
+  Mprog,  P=xxx, A=Required by sendmail but unused
+
+
+--- 392,398 ----
+  #
+
+  Msmtp,  P=[IPC], F=mDFMuX, S=10, R=0, A=IPC $h
+! Mlocal, P=d:\b\32\qsoup.exe , F=lmnDFM, S=10, R=0, A=-m -i $u
+  Mprog,  P=xxx, A=Required by sendmail but unused
+
+---------------------- 
+
+CCaann II uussee VVSSoouupp ttooggeetthheerr wwiitthh CChhaannggii??
+
+Yes, you can use VVSSoouupp as the news feeder for CChhaannggii.  For reply
+transmission CChhaannxx must still be used.  The following setup should
+work:
+
+- setup VVSSoouupp for news reception as described in the installation
+  section,
+
+- after VVSSoouupp operation ConvSoup must be called, which converts the
+  ..\\0000**..MMSSGG from binary format to the UUSSEENNEETT batch format,
+
+- then do a ccooppyy 0000**..mmssgg aallll__iinn__oonnee,
+
+- then call the CChhaannggii RRNNeewwss with aallll__iinn__oonnee as input file.
+
+The above is not tested!  If anybody likes to confirm the procedure,
+please send me an EMail.  Anyway the ..\\SSTTSSMMAAIILL..MMSSGG is not handled by
+the above procedure.
+
+Remark:
+        The question 'why should I use VVSSoouupp together with CChhaannggii?'
+        is triggered by the fact that several news servers do not
+        allow the NEWNEWS command, which is used by CChhaannxx for
+        multithreaded news reception.
+
+---------------------- 
+
+CCaann II uussee VVSSoouupp ttooggeetthheerr wwiitthh aannootthheerr oofffflliinnee nneewwssrreeaaddeerr tthhaann
+YYaarrnn//CChhaannggii??
+
+VVSSoouupp can be used as news/mail client for all offline newsreaders
+which expect SSOOUUPP format as input and generate articles in SSOOUUPP
+format on the output side.  Perhaps ConvSoup has to be used to
+convert the received messages into the correct data format known by
+your newsreader.
+
+For squish based newsreader there exists a free converter which makes
+VVSSoouupp usable also for people prefering such readers.
+
+Reports of successfully combining VVSSoouupp with other newsreaders than
+YYaarrnn and the corresponding recipes are highly welcome and (c|sh)ould
+be submitted to rgriech@swol.de.
+
+---------------------- 
+
+WWhheerree ttoo oobbttaaiinn mmoorree iinnffoorrmmaattiioonn aabboouutt SSOOUUPP??
+
+For more information about SSOOUUPP refer to Soup12.Html which can be
+found on the net, e.g. at http://www.eden.com/~combee/soup12.html.
+
+---------------------- 
+
+WWhheerree aarree tthhee iinntteerrnneett ssttaannddaarrddss ddeessccrriibbeedd??
+
+The internet standards are described in Request For Comment
+documents (RFC).  VVSSoouupp uses the NNNNTTPP, PPOOPP33 and SSMMTTPP
+standards.  A good starting point for RFC reading is e.g.
+http://ds2.internic.net/ds/rfc-index.html.
+
+RFCs of interest are:
+
+RFC821  Simple Mail Transfer Protocol,
+
+RFC822  Standard for the format of ARPA Internet text messages,
+
+RFC977  Network News Transfer Protocol,
+
+RFC1036
+        Standard for interchange of UUSSEENNEETT messages,
+
+RFC1460
+        Post Office Protocol - Version 3.
+
+---------------------- 
+
+WWhheerree ttoo oobbttaaiinn tthhee llaatteesstt vveerrssiioonn ooff VVSSoouupp??
+
+I will upload public releases of VVSSoouupp to ffttpp..ccddrroomm..ccoomm, ffttpp..lleeoo..oorrgg
+and ffttpp--ooss22..nnmmssuu..eedduu (Hobbes).  The corresponding URLs are:
+
+- ftp://ftp.leo.org/pub/comp/os/os2/leo/tcpip/news/vsoup*.zip
+
+- ftp://ftp.cdrom.com/pub/os2/new/vsoup*.zip, later on it can be
+  found at ftp://ftp.cdrom.com/pub/os2/internet/vsoup*.zip.
+
+- ftp://ftp-os2.nmsu.edu/new/vsoup*.zip, later on it can be found at
+  ftp://ftp-os2.nmsu.edu/os2/internet/vsoup*.zip.
+
+Version notification will take place in the YYaarrnn mailing list.
+
+The current update frequency is at about one release per month.  But
+this will stabilize in the very near future (09-Nov-1996).
+
+EExxppeerriimmeennttaall versions can be downloaded from
+http://privat.swol.de/ReinhardGriech/vsoup.zip.  VVeerryy
+eexxppeerriimmeennttaall - one could say: alphas - can be obtained from
+http://privat.swol.de/ReinhardGriech/vsoupbeta.zip.  Content of both
+archives is only an executable of VVSSoouupp.  The alpha version could
+contain perhaps some debugging output.  NNeeiitthheerr tthheerree iiss aa gguuaarraanntteeee
+tthhaatt vveerrssiioonnss ddoowwnnllooaaddeedd ffrroomm tthhiiss ssiittee wwiillll wwoorrkk,, nnoorr wwiillll tthheeyy bbee
+ssuuppppoorrtteedd iinn aannyy wwaayy ffrroomm mmyy ssiiddee (if anybody likes to call that
+support...).
+
+---------------------- 
+
+WWhheerree ttoo oobbttaaiinn tthhee llaatteesstt vveerrssiioonn ooff YYaarrnn??
+
+Best place to check is http://www.vex.net/yarn/.  For notification
+about new versions check the YYaarrnn mailing list.
+
+---------------------- 
+
+HHooww ttoo ssuubbssccrriibbee ttoo tthhee YYaarrnn mmaaiilliinngg lliisstt??
+
+To subscribe to the mailing list, mail a message to
+listproc@lists.colorado.edu.  The body of the message should be the
+line ssuubbssccrriibbee yyaarrnn--lliisstt YYoouurr FFuullll NNaammee, assuming YYoouurr FFuullll NNaammee is
+your full name.  If it isn't, substitute your own name.

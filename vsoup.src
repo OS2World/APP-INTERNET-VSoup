@@ -1,0 +1,3545 @@
+þif false
+$Id: vsoup.src 1.15 1997/04/20 19:29:32 hardy Exp $
+þendif
+
+þlanguage english
+þreplace VS VSoup1.2.8
+þreplace VSZip þbf{VSOUP127.ZIP}
+þformat bold VSoup1.2.8 VSoup1.2.7 VSoup1.2.5 VSoup1.2 VSoup
+þreplace LOGINISP þhpt{LOGINISP.CMD}
+þreplace LOGOUTISP þhpt{LOGOUTISP.CMD}
+þreplace YARNIOSET þhpt{YARNIO.SET}
+þreplace YIO þhpt{YarnIo}
+þreplace ConvS þhpt{ConvSoup}
+þreplace CONVSOUPEXE þhpt{CONVSOUP.EXE}
+þreplace OwnS þhpt{OwnSoup}
+þreplace OWNSOUPEXE þhpt{OWNSOUP.EXE}
+þreplace QS þhpt{QSoup}
+þreplace QSOUPEXE þhpt{QSOUP.EXE}
+þreplace ImportProg þbf{import}
+þreplace FilterProg þbf{filter}
+þformat bold Yarn emxrev emxdoc REXXTRY
+þformat bold YARNIO VSOUP.EXE YARNIO.CMD MODIFYEMXH.CMD RMHIGH.CMD FILTER.EXE
+þformat bold VSOUP.INF VSOUP.TXT
+þformat bold emx emx09a emx09b emx09c SOUP Souper Souper16 USENET UNIX Changi Chanx RNews sendmail inews GNU
+þformat abbrev e.g. i.e. etc. Str. D.
+þformat tty ETC EMXOPT HOME MAILER NNTPSERVER PATH POSTER TMP TZ
+þformat tty NNTP POP3 SMTP
+þformat tty nntp:// pop3:// smtp://
+þformat tty %HOME% %HOME%\NEWSRC %HOME%\NEWSTIME %HOME%\NEWSAUTH %HOME%\SCORE NEWSRC NEWSTIME SCORE
+þformat tty %HOME%\YARN\CONFIG %HOME%\YARN\IN\NEWS2
+þformat tty NEWSRC NEWSTIME
+þformat tty %TMP%
+þformat tty %ETC%\SERVICES %ETC%\TCPOS2.INI
+þformat tty .\COMMANDS
+þformat tty .\STSMAIL.MSG .\NEWS.MSG .\MAIL.MSG .\REPLIES .\AREAS CONFIG.SYS
+þformat tty .\*.MSG .\00*.MSG .\00*.IDX
+þformat tty RCVNEWS RCVNEWS2 RCVMAIL SEND
+þformat tty reply-packet sendmail.uml sendmail.cf
+þreplace ReplyPacket þsl{reply packet}
+þreplace VSoupSend þsy{"VSoup -s"}
+þreplace LESS þbf{Less}
+þreplace GNU þbf{GNU}
+þreplace GNUs þbf{GNU}s
+þformat syntax -i -h40 -M -h<dir> -m -n -r -s -T<n> -K -N -h -c -T-1 -t8 -D
+þformat syntax -a -c[n] -k<n> -K<file> -N<file> -S<n> -t<n> -u -x -S0 -S1 -S2
+þformat bold Q- A- Q1- Q2- A1- A2-
+
+þif text
+þreplace LINEBREAK þbreak ---------------------- þbreak
+þendif
+
+þif ipf
+þreplace LINEBREAK þbreak
+þendif
+
+þif html
+þreplace LINEBREAK þem{}
+þendif
+
+
+þtext
+===============================================================================
+VSoup1.2.8                     NNTP/POP3/SMTP client                19-Apr-1997
+===============================================================================
+                                        Copyright (c) 1996-1997 by Hardy Griech
+þendtext
+
+þhtml
+<hr size=4><center>
+<h1>VSoup1.2.8   19-Apr-1997</h1><p>
+<h2>The multithreaded Souper for OS/2</h2><p>
+<i>Copyright (c) 1996-1997 by Hardy Griech</i><p>
+</center><hr size=4>
+þendhtml
+
+
+
+þtitle VSoup1.2.8 - the multithreaded Souper for OS/2
+
+þif text
+þh= Table of Contents
+þtoc
+þendif
+
+þif html
+þhtml
+<h1>Table of Contents</h1>
+þendhtml
+þtoc
+þendif
+
+
+þh1 Introduction to VSoup
+
+þipf
+:font facename=Helv size=24x14.
+:hp2.
+.ce VSoup1.2.8   19-Apr-1997
+:p.
+.ce The multithreaded Souper for OS/2
+:ehp2.
+:p.
+:font facename=Helv size=16x10.
+.ce Copyright (c) 1996-1997 by Hardy Griech
+:font facename=default size=0x0.
+:p.
+:p.
+þendipf
+
+  VS is a multithreaded network mail and news client program for OS/2
+  Warp with TCP/IP (or the Internet Access Kit) installed.  It
+  transfers mail and news fetched from a POP3 server and NNTP server
+  respectively to packets in SOUP format.  It can also send messages
+  in SOUP reply packets to NNTP / SMTP servers.
+
+  VSoup is especially designed to work with Yarn, but it is probable
+  that VSoup will work with most offline newsreaders which expect SOUP as
+  their input and output.
+
+  The program requires the emx run-time DLLs.  You can get these from
+  e.g.
+
+þtypewriter
+   þurl{ftp://ftp.leo.org/pub/comp/os/os2/leo/gnu/emx+gcc/emxrt.zip}
+þendtypewriter
+
+  The emx09c run-times or newer are required.  emxrev should show at
+  least revision 50 for the DLLs.  VSoup may work with an earlier version
+  such as emx09b, but keep in mind that there were many changes in the
+  DLLs concerning multithreading / sockets since emx09a.
+
+ þbreak
+
+þtext
+-------------------------------------------------------------------------------
+!!!!!       MAKE SURE THAT YOU ARE USING THE CORRECT EMX DLL-VERSIONS     !!!!!
+-------------------------------------------------------------------------------
+þendtext
+
+þipf
+:hp2.
+.ce !!!!! MAKE SURE THAT YOU ARE USING THE CORRECT EMX DLL-VERSIONS !!!!!
+:ehp2.
+þendipf
+
+þhtml
+<p><center>
+<hr size=2,width=20%>
+<tt><b>MAKE SURE THAT YOU ARE USING THE CORRECT EMX DLL-VERSIONS</tt></b>
+<hr size=2,width=20%>
+</center><p>
+þendhtml
+
+
+þh1 Legal Issues
+
+  This program is heavily based on ideas and modules from Chin Huangs
+  (cthuang@io.org) Souper15.  Thanks to him for both Souper and Yarn.
+
+ þem{Please note that bug reports and everything else concerning VSoup}
+ þem{should be directed to Hardy Griech (rgriech@swol.de), not to Chin}
+ þem{Huang!}
+
+þh- Standard Disclaimer
+
+  VSoup is free software; you can redistribute it and/or modify it under
+  the terms of the GNU General Public License (GPL) as published by
+  the Free Software Foundation; either version 2, or (at your option)
+  any later version.  For more details about the GPL see the file
+  þbf{COPYING} contained in this archive.
+
+  VSoup is distributed in the hope that it will be useful, but þem{without
+  any warranty}; without even the implied warranty of þem{merchantability}
+  or þem{fitness for a particular purpose}.  See the GNU General Public
+  License for more details.
+
+
+þh- Warning
+
+  Some news sites might see VSoup as a news sucking utility and might
+  feel offended by its use.
+
+  The intention is that VSoup is to be used to receive news for your
+  personal use from a reasonable number of newsgroups.
+
+  Misuse of this program could conceivably result in a general ban on
+  the use of this or similar programs to the detriment of responsible
+  VSoup users who certainly don't want a general ban of VSoup.
+
+
+þhtml
+   <A NAME="features"></a>
+þendhtml
+þh1 Features
+þindex Features of VSoup
+
+þitemize
+þitem 
+
+   Multithreaded news receiving is supported, anything between 1 and
+   10 threads can be started (default 4), and in addition there are
+   several possible strategies for fine tuning.
+
+   Multithreading gives a speed gain of 200%-500% depending on the
+   overall speed of the connection and the number of threads; on the
+   other hand multiple connections have a communication overhead
+   (i.e. the connections must be established, the groups selected).
+   Estimated loss is around 5%...
+
+þitem
+
+   all the packets are exchanged in SOUP format files, i.e. offline
+   readers expecting as input format either SOUP or USENET batch
+   format can be used together with VSoup.
+
+þitem
+
+   VSoup generates a status message as incoming mail. (this is not in
+   the SOUP standard, but is recognized by Yarn). Normally this
+   message is only generated in case of failure (eg., cannot select
+   newsgroup) or when special events occur (eg., when new newsgroups
+   are added), but the generation can be forced to always occur by
+   means of a command line option.
+
+þitem
+
+   VSoup will show some statistic information about data transfer.
+
+þitem
+
+   Specification of the required servers is easy by using þhpt{URL}s
+   on the command line.
+
+þitem
+
+   It is possible to filter articles by header lines before retrieving
+   the body text, see þhpt{score file} handling.  VSoup allows regular
+   expression for both group and header patterns, article length is
+   treated special.
+
+þitem
+
+   VSoup detects too low throughput or stuck connections.
+
+þitem
+
+   VSoup knows about NNTP authentication.
+
+þitem
+
+   YIO, a script to do VSoup operation safely (without risk of message
+   loss etc.)  is included in the archive.  YIO is capable of
+   simultaneously receiving news from up to nine separate NNTP news
+   servers, posting news to NNTP, receiving mail from up to nine POP3
+   servers and sending mail to SMTP.
+
+þitem
+   Other utilities included are
+þdescription
+þitem OwnS
+   This, with the help of the Yarn ImportProg program, redirects
+   news articles matching a specific pattern into a separate mail folder which will
+   show up when you read your mail with Yarn.
+
+   For example you can search newsgroups for any mention of your name
+   or any mention of a program you are interested in.
+þitem QS
+   This appends mail and news messages to the Yarn ReplyPacket
+   file for transmission by VSoup.
+þitem ConvS
+   This transforms all articles from binary SOUP format to mailbox/USENET format.
+þenddescription
+
+þitem
+
+   þhpt{FAQ} included.
+
+þitem
+
+   source code included.
+
+þitem
+
+   freeware according to GPL (without any warranty for correct
+   function etc.).
+
+þenditemize
+
+
+
+
+þhtml
+   <A NAME="installation"></a>
+þendhtml
+þh1 Installation
+þlabel Installation
+þlabel installation
+þindex Installation
+
+  This section describes the installation of VSoup on a step by step
+  basis.  Steps (1)-(4) are for preparation to ensure that you have a
+  system configuration which can run VS.
+
+  The installation instructions assume that you intend to run VSoup with
+  the help of YIO.  If you wish to use VSoup on its own for example to
+  benefit from multithreaded news reception, but do not need YIO,
+  simply skip the steps (7)-(11) and parts of (6).
+
+  Anyway you can use YARNIO.CMD as an example.
+
+  If you experience any problems take a look at the
+  þhpt{troubleshooting} section.
+
+  If you are upgrading an older VSoup version, you should have a look at
+  the þhpt{history} section for hints on important changes.
+
+
+ þbreak
+þenumerate
+
+þitem
+   your system must be one of the following:
+þitemize
+þitem
+   OS/2 2.x with TCP/IP (not tested but should work)
+þitem
+   OS/2 3.0 (Warp) with the 'Internet Access Kit' installed
+þitem
+   OS/2 3.0 (Warp Connect) with TCP/IP installed
+þitem
+   anything above
+þenditemize
+
+þitem
+
+   get the latest version of the emx runtime library and install it or
+   check your current installation with emxrev.  This should show a
+   revision level higher than or equal to '50'.  If you are not
+   intending to use YIO, then add an environment setting of þtt{SET
+   EMXOPT=-h40} to your CONFIG.SYS as noted in the þhpt{environment
+   settings} section below.
+
+þitem 
+
+   check your environment variables according to the þhpt{environment
+   settings} section below.
+
+þitem
+   check your %ETC%\SERVICES file to ensure that it contains the
+   following lines:
+
+þverbatim
+  smtp         25/tcp mail          #Simple Mail Transfer
+  smtp         25/udp mail          #Simple Mail Transfer
+  pop3        110/tcp               #Post Office Protocol - Version 3
+  pop3        110/udp               #Post Office Protocol - Version 3
+  nntp        119/tcp readnews untp #Network News Transfer Protocol
+  nntp        119/udp readnews untp #Network News Transfer Protocol
+þendverbatim
+
+   Most probably the %ETC%\SERVICES file is located either in
+   þtt{x:\TCPIP\ETC} or þtt{x:\MPTN\ETC}.  If you need to specify
+   non-standard port numbers, you should do that in the command line.
+   Check the þhpt{URL} specification.
+
+
+þitem
+
+   unzip the VSZip archive in a temporary file directory (%TMP% is a
+   good place).
+
+þitem
+
+   copy the following files into a subdirectory of your choice (using
+   a subdirectory contained in the PATH statement is always a good
+   choice):
+
+þitemize
+þitem
+   VSOUP.EXE, the VSoup executable
+þitem
+   YARNIO.CMD, the YIO script
+þitem
+   YARNIOSET, the YIO configuration file
+þdescription
+þitem Note:
+      YARNIO.CMD & YARNIOSET must reside in the same subdirectory and
+      must have the same filename, except the extension...
+þenddescription
+þitem
+   If you want YIO dial automatically, then you should also
+   copy LOGINISP and LOGOUTISP as templates for your own
+   connect/disconnect scripts.
+þitem
+   OWNSOUPEXE and/or QSOUPEXE and/or CONVSOUPEXE should be copied if required.
+þitem
+   If you want to have help available, then copy also the documentation: either
+   VSOUP.INF or VSOUP.TXT (both have the same content but different format).
+þitem
+   If you are interested in the source code, move it also to a
+   specific subdirectory.
+þenditemize
+
+þitem
+   review the þhpt{Command Line Options} section below and edit the
+   YARNIOSET configuration file according to your specific needs.
+   Also read the comments in YARNIOSET.
+
+þdescription
+þitem Note:
+   the setup of YARNIOSET is required only once. In future, updates
+   will be made by amending YARNIO.CMD.
+þenddescription
+
+þitem
+   If you wish YARNIO.CMD to dial for you, you must also setup the
+   scripts LOGINISP and LOGOUTISP to reflect your
+   needs.
+
+   Another option is to use your dialer to call your ISP (provider)
+   and start YIO after the connection has been established.  The
+   disadvantage of doing it this way is that after completion of
+   YIO the dialer will not hang up immediately.
+
+þdescription
+þitem Note:
+      If you have only FAT drives you have to rename LOGOUTISP to
+      something else.  Therefor you have to change the þtt{hangupISP}
+      setting in YARNIOSET too.
+þenddescription
+
+þitem
+
+   setup the directory structure for YIO:
+
+þverbatim
+  %HOME%ÄÄ yarn             - subdirectory containing Yarn config file
+           :
+           ÃÄÄ in           - root of YarnIo input subdirectories
+           ³   ÃÄÄ mail     - primary     subdir for EMail reception
+           ³   ÃÄÄ mail2    - optional #2 subdir for EMail reception
+           ³   ÃÄÄ :                          :
+           ³   ÃÄÄ mail9    - optional #9 subdir for EMail reception
+           ³   ³
+           ³   ÃÄÄ news     - primary     subdir for news reception
+           ³   ÃÄÄ news2    - optional #2 subdir for news reception
+           ³   ÃÄÄ :                          :
+           ³   ÀÄÄ news9    - optional #9 subdir for news reception
+           ÃÄÄ out          - subdirectory for EMail&news transmission
+           :
+þendverbatim
+
+    In each of the þtt{NEWS} subdirectories you will need to create an
+    appropriate NEWSRC file as detailed in the þhpt{Newsrc File}
+    section.
+
+    The þtt{..MAIL}, þtt{..MAIL2} until þtt{..MAIL9} subdirectories
+    have to be created only.  They should be left empty.
+
+    The number of subdirectories depend on the number of servers you
+    wish to poll.
+
+þitem
+
+   change the following line in the Yarn-config file
+   (%HOME%\YARN\CONFIG):
+
+þverbatim
+  reply-packet=%HOME%\yarn\out\reply.zip
+þendverbatim
+
+   If this is omitted or is incorrect then transmission of replies
+   will not be possible, because Yarn will move its output to a place
+   where VSoup does not expect it!  Of course %HOME% should be replaced
+   by the actual value of HOME.
+
+þitem
+
+   if you have setup LOGINISP and LOGOUTISP, start YIO
+   directly.  Otherwise first dial-in to your ISP and then start
+   YIO.
+
+þendenumerate
+
+   When you first start using VSoup I recommend that you add the -M
+   option to each call of VSoup (e.g. in YARNIOSET) to force generation
+   of the status mail.  This can be a good debugging aid...
+
+
+
+þh2 Environment Settings
+þlabel environment settings
+þlabel environment
+þi1 Environment Settings
+  
+  Environment variables are set in your CONFIG.SYS by lines such as:
+þverbatim
+  SET ETC=D:\TCPIP\ETC
+þendverbatim
+  Also they can be set in a dedicated script, which calls VS.
+
+þdescription
+
+þitem EMXOPT
+þi2 EMXOPT
+
+   This are the settings for the emx runtime DLLs.  Recommended
+   setting of this variable should contain -h40 to allow 40 file
+   handles (not required, if you are calling VSoup through YIO).
+
+þitem ETC
+þi2 ETC
+
+   This is needed for accessing the TCP/IP configuration contained in
+   the file %ETC%\TCPOS2.INI.  If -i is specified in the command line,
+   ETC is not required.
+
+þitem HOME
+þi2 HOME
+
+   your home directory (can also be specified on the command line).
+   If HOME is not defined, it defaults to the current directory.
+
+þitem MAILER
+þi2 MAILER
+
+   command for transmitting EMails (the EMail is piped into the stdin
+   of MAILER).  If VSoup should do the job, MAILER must be undefined.
+
+þitem NNTPSERVER
+þi2 NNTPSERVER
+
+   hostname of the nntp server (can also be specified in the command
+   line).  This variable is, in my opinion, obsolete and remains only
+   to avoid compatibility problems.
+
+þitem POSTER
+þi2 POSTER
+
+   command for transmitting news (the article is piped into the stdin
+   of POSTER).  If VSoup should do the job, POSTER must be undefined.
+
+þitem TMP
+þi2 TMP
+
+   points to the subdirectory which holds temporary files (VSoup
+   generates þsy{soup<xxxx>.tmp} as temporaries, with þsy{<xxxx>}
+   being a number between 0000 and 9999).  If TMP does not exist, the
+   temporaries will be generated in the current subdirectory.
+
+þitem TZ
+þi2 TZ
+
+   setting of your time zone (e.g.  mine is þtt{MET-1MES}).  Due to a
+   bug in the emx runtime, the setting of this variable is critical
+   for correct functioning of the emx C library revision 50.  Check
+   the emx runtime documentation for the syntax of the TZ settings.
+
+   An incorrect setting of TZ can also cause errors if you appear to
+   be getting mail before it was sent.
+
+
+þenddescription
+
+
+þh2 VSoup And YarnIo Troubleshooting
+þlabel troubleshooting
+
+  some simple checks can be carried out:
+
+þitemize
+
+þitem
+   read the þhpt{FAQ} section.
+
+þitem
+
+   if VSoup does not run at all, initiate VSoup with þtt{VSOUP -?}.  This
+   should output the usage information to the screen.  If it does not,
+   you have to check your system configuration.  Otherwise you should
+   try to call VSoup in its different modes directly from the command
+   line to check all your command line options.
+
+þitem
+
+   generate the VSoup status mail with -M and check if it tells you the
+   expected file locations and server names.
+
+þitem
+
+   is the configuration file YARNIOSET correct and in the same
+   directory as YARNIO.CMD?
+
+þitem
+
+   is the subdirectory setup correct for YIO?
+
+þitem
+
+   does the þtt{pingHost} command work as expected?  Issue the program
+   via REXXTRY to check the return values in connected/disconnected
+   case.
+
+þitem
+
+   if you have a setup including LOGINISP and LOGOUTISP you
+   can also check if they work.  Run LOGINISP from a command line
+   - login should be performed.  Then run LOGOUTISP - logout
+   should be performed.  Now also the YIO auto-dial/hangup should
+   work...
+
+þitem
+
+   connect to your ISP and try þtt{YARNIO -RCVMAIL -SEND -RCVNEWS2}.
+   This will start only the þtt{YarnIo RCVNEWS} window (hit ctrl-ESC
+   and open it).  News reception should be performed as expected, at
+   the end ImportProg to yarn will be initiated (after that 30s
+   pause).
+
+   You can check all single YIO modes this way.
+
+þitem
+
+   is VSoup called in each window started by YIO?
+
+þenditemize
+
+
+
+þh1 Command Line Options
+þlabel Command Line Options
+þlabel command line option
+þi1 Command Line Options
+
+  This section describes the VSoup command line options in detail.  An
+  example is presented first.
+
+þh- Example
+
+þverbatim
+  VSoup -m -h d:\yourHomedir nntp://your.news.server
+þendverbatim
+
+  This would start VSoup telling it not to fetch mail (i.e. to collect
+  news only) using a home directory called þtt{d:\yourHomedir} from a
+  news server named þtt{your.news.server}. The þsy{loginid} and
+  þsy{password} would by default be taken from your TCP/IP
+  configuration.
+
+þipfminitoc
+
+
+þh2 Global Options
+þlabel global options
+
+þdescription
+
+þitem -h<dir>
+þi2 -h<dir>, set home directory
+
+   sets the home directory for the VSoup operation.  You can also specify
+   your home directory through the þhpt{environment} variable HOME.
+
+þitem -i
+þi2 -i, ignore TCP/IP configuration
+
+   ignore the settings of the TCP/IP configuration.
+
+þitem -m
+þi2 -m, do not fetch mail
+
+   do not fetch mail.
+
+þitem -M
+þi2 -M, generate status mail
+
+   generate the VSoup status mail .\STSMAIL.MSG in any case.  Default is
+   to generate the message in case of error only.
+
+þitem -n
+þi2 -n, do not fetch news
+
+   do not fetch news.
+
+þitem -r
+þi2 -r, read only mode
+
+   read only mode.  Only the .\AREAS, .\00*.MSG, .\00*.IDX files are
+   written (e.g.  %HOME%\NEWSTIME, %HOME%\NEWSRC are not
+   written). Also the EMails are not deleted from the POP3 server.
+   Main purpose for this option is debugging.
+
+þitem -s
+þi2 -s, send replies
+
+   send replies.  Do not use this option in combination with -m or -n,
+   if you do it will be ignored.
+
+þitem -T<n> 
+þi2 -T<n>, set throughput limit
+
+   throughput must be higher than þsy{<n>}, otherwise transfer will be
+   aborted.  Throughput is checked against the limit þsy{<n>} every
+   10s after data transfer has begun.  If 6 samples show not enough
+   throughput, VSoup will be aborted.  Default is '0 bytes/s', i.e. it
+   will be checked for a stuck connection.  Use þsy{-T-<n>} to check
+   your throughput conditions.  Special case is -T-1, which disables
+   throughput check.
+
+þenddescription
+
+
+þh2 News Receiving Options
+þlabel news receiving options
+
+þdescription
+
+þitem -a
+þi2 -a, add new newsgroups
+
+   add new newsgroups to the þhpt{%HOME%\NEWSRC} file.  If there are
+   any new groups on the server, the generation of the status message
+   will be forced.  The new newsgroups will be added in the
+   unsubscribed state.
+
+þitem -c[n]
+þi2 -c[n], catchup
+
+   catchup: mark every article as read except for the last þsy{n}
+   (default is 10).
+
+þitem -k<n>
+þi2 -k<n>, set maximum packet size
+
+   set maximum news packet size to n KBytes (default is no limit).
+   þsy{<n>} indicates the total amount of received messages, not the
+   size of a single message (this can be done through þhpt{scoring}).
+
+þitem -K<file>
+þi2 -K<file>, set score file
+
+   set the name of the þhpt{score file} (see note below concerning
+   þhpt{-K/-N options}).
+
+þitem -N<file>
+þi2 -N<file>, set newsrc file
+
+   set the name of the þhpt{NEWSRC} file (see note below regarding
+   þhpt{-K/-N options}).
+
+þitem -S<n>
+þi2 -S<n>, set news receiving strategy
+
+   receiving strategy (þsy{<n>}=0..2).  Speed increases (at least it should)
+   in the direction 0 to 2, danger of receiving crossposted articles
+   increases also from 0 to 2. The default of 1 is ok for most cases,
+   but this parameter is an issue of fine tuning!
+
+   How the strategy parameter operates:
+
+þdescription
+þitem -S0
+
+       groups are read sequentially, i.e. all threads are fetching
+       articles from only one group.
+
+þitem -S1
+
+       if one thread goes into waiting state the next group will be
+       accessed - only small modification of the above.
+
+þitem -S2
+
+       VSoup tries to keep all threads busy.  I.e. each thread
+       accesses one dedicated group, groups are read in parallel (if
+       there are no more groups to access, the waiting threads are
+       used for parallel reading from one group).
+
+þenddescription
+
+   Recommendation:
+
+þitemize
+þitem
+
+      If you have a lot of groups with small amount of articles per
+      fetch and only a little bit cross-posting, -S2 will be the
+      best option for you.  If you allow reception of crossposted
+      articles (see option -x), -S2 will be best for you in any
+      case.
+
+þitem
+
+      if you are accessing groups with large articles (i.e.  cost of
+      double reception of crossposted articles is high), -S0 will be
+      the best for you.
+
+þenditemize
+
+þitem -t<n> 
+þi2 -t<n>, set number of threads
+
+   receive the news with þsy{<n>} threads, i.e.  connect to the NNTP server
+   þsy{<n>} times (limits are 1-10, default 4).
+
+þitem -u 
+þi2 -u, create news summary
+
+   create news summary.  Output can be found in the .\00*.IDX files.  Be
+   aware that the summarized articles are marked as read (one way to
+   get out of this, is to call VSoup with -r).
+
+þitem -x
+þi2 -x, do not process Xref headers
+
+   do not process news Xref headers, i.e.  allow reception of
+   crossposted articles.
+
+þenddescription
+
+
+þh3 Note Concerning The -K And -N Options
+þlabel -K/-N options
+
+  If you are using the -h option then use of either of the options -K
+  or -N is not recommended, because behavior is not very transparent.
+
+  If the -h option is placed behind the -K / -N options the result
+  will not be as expected - VSoup (and Souper) will revert to þtt{SCORE}
+  and NEWSRC in the new specified home directory.
+
+  If -K / -N options are placed behind the -h option and do not
+  contain absolute paths, they will not be located in the home
+  directory specified by -h.
+
+  This is confusing and will be fixed in a future release.
+
+ þem{It is better and cleaner to use -h and setup the special}
+ þem{SCORE/NEWSRC files in that subdirectory!}
+
+
+þh2 Mail Receiving Option(s)
+þlabel mail receiving options
+
+þdescription
+
+þitem -D
+þi2 -D, force delete of mail
+
+  If specified, VSoup will logout and login after reception of each
+  EMail, thus effectively forcing deletion of the letter on the POP3
+  server.  This is useful, if your connection to the POP3 server is
+  aborted often and your mailbox is full.  Normal behaviour is to
+  retrieve EMail without disconnecting/connecting.
+
+þenddescription
+
+
+þh2 URLs
+þlabel URL
+þi1 URLs
+
+  The addresses of the hosts are given in þbf{U}nified þbf{R}esource
+  þbf{L}ocator (URL) form.  These do not fully conform to the
+  standard, so a short explanation follows:
+
+
+þitemize
+
+þitem
+þi2 nntp://
+
+   þsy{nntp://[UserId[:Password]@]nntp-host[:port]} defines the address of
+   your NNTP server (i.e. news server).  þsy{UserId} and þsy{Password}
+   can be given if required for AUTHINFO.
+
+þitem
+þi2 pop3://
+
+   þsy{pop3://[UserId[:Password]@]pop3-host[:port]} defines the address of
+   your POP3 server.  þsy{UserId} and þsy{Password} are usually
+   required.
+
+þitem
+þi2 smtp://
+
+   þsy{smtp://[UserId[:password]@]smtp-gateway[:port]} defines your SMTP
+   gateway.  þsy{UserId} and þsy{Password} are not required, in fact
+   they are ignored by VS!
+
+þenditemize
+
+  The URL-feature makes VSoup different to Souper16, which wants to see a
+  %HOME%\NEWSAUTH file for NNTP authorization.
+
+  Notes:
+þenumerate
+þitem
+  It is not intended to implement other protocols like þtt{http} or
+  so.
+þitem
+  If þsy{port} is not specified, the actual port number is taken from the
+  %ETC%\SERVICES file.  This is the recommended way of port number handling.
+þendenumerate
+
+
+þh3 Brief Description Of NNTP/POP3/SMTP
+
+  Mail can be compared to the postal service, just like a letter.
+  EMail-reception is handled through POP3 server (pop3:// prefix),
+  transmission through SMTP gateways (smtp:// prefix).
+
+  News messages are more like broadcasting, everybody will 'hear' your
+  message.  News messages are transmitted and received via NNTP
+  servers (nntp:// prefix).
+
+  Perhaps it is a little bit confusing, that you can also deliver news
+  via EMail service (just like the Yarn list).  The other way around
+  is not possible...
+
+  Anyway, please don't mix up news and EMail (your EMail might be
+  news, but in these terms they remain EMails).
+
+
+þh3 Evaluation Order Of URLs
+
+  VSoup evaluates URLs in the following order:
+
+þenumerate
+
+þitem
+
+   take all information from the 'Internet Connection for OS/2'
+   notebook settings
+
+þitem
+
+   check the NNTPSERVER þhpt{environment} settings
+þdescription
+þitem Note1:
+      NNTPSERVER is a URL without leading nntp://
+þitem Note2:
+      there are no environment variables for the SMTP / POP3 setup.
+þenddescription
+
+þitem
+
+   command line options
+
+þendenumerate
+
+  If you specify only e.g. þsy{nntp://your.news.server} in the command
+  line (without userid/password), the userid and password from the
+  TCP/IP configuration are taken as a standard value.
+
+
+þh2 News Reception
+þlabel News Reception
+
+  For news reception you have the following options (which cannot
+  combined):
+
+þitemize
+þitem
+   either process .\COMMANDS (.\COMMANDS exists),
+þitem
+   or catch-up the newsgroups (-c option),
+þitem
+   or create newsgroups summary (-u option),
+þitem
+   or receive the news in the standard way (no specific option).
+þenditemize
+
+  New newsgroups are added to the %HOME%\NEWSRC file, when news is
+  received in the standard way and the command line option -a is
+  given.
+
+
+þh1 Diagnostics
+þindex Diagnostic Codes
+
+  VSoup returns with an exit code of þbf{1}, if any operation failed.
+  Otherwise return code will be þbf{0}.
+
+  Failing operations are:
+
+þitemize
+þitem
+  bad command line options,
+þitem
+  bad setup (e.g. no ETC set, but 'Internet Connection' settings
+  requested),
+þitem
+  bad OS (e.g. D*ø@!S),
+þitem
+  user hit ^C or ^BREAK,
+þitem
+  throughput check failed (e.g. connection broken),
+þitem
+  could not setup connection (e.g. server not defined, server does not
+  exist, server is down, etc.),
+þitem
+  there was no .\REPLIES file and you have requested -s,
+þitem
+  .\REPLIES contains an illegal entry,
+þitem
+  .\MAIL.MSG or .\NEWS.MSG is malformed,
+þitem
+  could not deliver news article, e.g. NNTP server did not allow it,
+þitem
+  could not deliver mail, e.g. POP3 authentication failed,
+þitem
+  MAILER / POSTER contains illegal value,
+þitem
+  there is no NEWSRC file,
+þenditemize
+
+þh- .\STSMAIL.MSG
+
+In case of an error condition the status message .\STSMAIL.MSG will be
+generated.  Under the following additional cases .\STSMAIL.MSG will be
+generated too:
+
+þitemize
+þitem
+  VSoup was called with the -M option (force .\STSMAIL.MSG generation),
+þitem
+  VSoup was called with -a and there were new newsgroups on your NNTP
+  server,
+þitem
+  VSoup could not select a newsgroup specified in NEWSRC,
+þitem
+  VSoup could not select a newsgroup specified in .\COMMANDS,
+þitem
+  a newsgroup specified in .\COMMANDS was not contained in NEWSRC,
+þitem
+  there was another command than þtt{sendme} contained in .\COMMANDS,
+þitem
+  a specified (þsy{-K<file>}) score file does not exist.
+þitem
+  .\REPLIES contained an illegal (i.e. not understood by VS) reply
+  type.  Legal reply types are 'b' and 'B',
+þitem
+  .\REPLIES contained an illegal (i.e. not understood by VS) reply
+  kind.  Legal reply kinds are þsy{"mail"} and þsy{"news"}.
+þenditemize
+
+
+þh- Future extensions
+
+  The following failing operations are NOT yet implemented fully:
+
+þitemize
+þitem
+   there was no EMail in your POP3 mailbox,
+þitem
+   there were no new news,
+þitem
+   you have requested -s, but a message file is missing (VSoup deletes
+   message files immediately after successful delivery.  Note that if
+   you need two runs to deliver all your messages e.g.  one file will
+   be missing on the second attempt.  This is considered ok).
+þenditemize
+
+  It is possible, that diagnostics code will change in the future.
+  Return codes with a cleared bit 0 (like 0,2,4,...)  will indicate a
+  non-fatal condition, return codes with a set bit 0 will indicate
+  fatal conditions.
+
+
+
+þh1 Utilities
+þi1 Utilities
+
+  This section describes the several utilities contained in VSZip
+  archive in more detail.  For most users only the YIO files will
+  be of interest.
+
+þipfminitoc
+
+þh2 YarnIo
+þlabel YarnIo
+þindex YarnIo
+þi2 YarnIo
+
+  As stated before YIO - actually consisting of YARNIO.CMD, YARNIOSET
+  and optionally of LOGINISP and LOGOUTISP - is responsible for safe
+  VSoup I/O operations.  The script(s) handle(s) the complete I/O between
+  Yarn and the internet world.  Newsgroups are read from up to nine
+  NNTP servers, mail/news packets are transmitted and mail is received
+  again from up to nine POP3 servers - all simultaneously.  Actions
+  can be disabled individually (type þsy{YARNIO ?} for more
+  information).
+
+  The script should be started directly after the connection has been
+  established.  It is also possible to let YIO dial out to
+  establish the connection. To do this you must provide the two
+  scripts LOGINISP and LOGOUTISP (see the þhpt{installation}
+  section).
+
+  Most items of the user configuration are in a file called
+  YARNIOSET.  It contains the settings for the initialization of the
+  external programs including VSoup, ImportProg ...  calls.
+
+þindent
+  þbf{You WILL need to amend the details in the YARNIO.SET file.}
+þendindent
+
+  Sorry, but the directory structure must be set up manually!  You
+  should follow the structure given above in the þhpt{installation}
+  section.
+
+
+þh3 YarnIo.Set
+þlabel YARNIO.SET
+
+  For configuration of YIO, YARNIOSET is required.  YARNIOSET must
+  reside in the same directory as YARNIO.CMD and must have the same
+  filename prefix (i.e. YARNIO).
+
+  YARNIOSET contains the statements which determine how YARNIO.CMD is
+  to call the several commands.
+
+  To give you an idea what must be configured in YARNIOSET, an
+  example follows.  There is a YARNIOSET contained in the archive,
+  which includes more comments.
+
+þverbatim
+  :
+'@SET NNTPSERVER='
+
+preImportProg = 'ownsoup -q rgriech stuff4me OwnTemp'
+importProg    = 'import.exe -u'
+soupProg      = 'vsoup.exe'
+soupSend      = soupProg '-s nntp://xmt.nntp.server'
+soupRcvNews   = soupProg '-mai' '-h' rcvNewsDir 'nntp://1st.nntp.server'
+soupRcvNews2  = soupProg '-mai' '-h' rcvNews2Dir 'nntp://2nd.nntp.server'
+soupRcvMail   = soupProg '-n'
+pingHost      = 'slipwait 2 2>&1 > nul'
+connectISP    = 'cmd /c loginisp.cmd NOWAIT'
+hangupISP     = 'cmd /c logoutisp.cmd'
+unzipProg     = 'unzip.exe -oq'
+zipProg       = 'zip -0mq'
+  :
+þendverbatim
+
+þh- Remarks
+
+þitemize
+þitem
+
+  Instead of þtt{slipwait} you could also use the command þtt{'ping x.y.z 1 2>&1 > nul'}.
+  The host þtt{x.y.z} in þtt{pingHost} must þem{not} be contained in
+  the þtt{%ETC%\HOSTS}, because otherwise þtt{pingHost} will return
+  unexpected results.
+
+þitem
+
+  Do not remove the option þtt{'-h' rcvNewsDir} from the
+  þtt{soupRcvNews} line or the option þtt{'-h' rcvNews2Dir} from the
+  þtt{soupRcvNews2} line.
+
+þitem
+
+  If you are not interested in a service (e.g. þtt{soupRcvNews2}), set
+  the corresponding variable to '' (empty string).
+
+þitem
+
+  If required, you can change the environment settings in YARNIOSET,
+  e.g. the above þtt{'@SET NNTPSERVER='} clears an existing
+  þtt{NNTPSERVER} environment variable.
+
+þitem
+
+  To enable news server #3..#9, you have to add
+  þtt{soupRcvNews3}..þtt{soupRcvNews9} lines into YARNIOSET.  Use
+  þtt{soupRcvNews2} as a template.  Of course you have to set up the
+  corresponding þhpt{Newsrc File}s in the respective subdirectories.
+
+  For POP3 server #2..#9 you have to set up
+  þtt{soupRcvMail2}..þtt{soupRcvMail9}.  You have to create the
+  corresponding subdirectories manually.
+
+  For setting up the correct subdirectory structure see also the
+  þhpt[Installation] section.
+
+þenditemize
+
+
+þh3 LoginIsp
+þlabel LOGINISP.CMD
+þi2 LOGINISP.CMD
+
+  LOGINISP is an optional script, which allows YIO to dial in to
+  your ISP.  The following example script will connect using the
+  internet dialer.  If you are a customer of Advantis the script will
+  work for you without any changes - of course you have to insert the
+  correct þtt{account user passwd} information.
+
+þverbatim
+/*
+  LoginIsp  -  rg211096
+
+  Login to your ISP.  If Option NOWAIT is given, the command will not wait
+  until connection has been established.
+
+  You have to do the following configuration:
+  -  the line '...logoutisp...' must show the effective logoff script
+  -  the line '...start...' must show the effective call of the dialer
+  -  the line '...ping...' must show a pinger to check connection
+ */
+
+call RxFuncAdd 'SysLoadFuncs', 'RexxUtil', 'SysLoadFuncs'
+call SysLoadFuncs
+
+TRACE('')
+
+option = ARG(1)
+
+DO FOREVER
+    '@cmd /c logoutisp.cmd'
+    '@start dialer.exe account user passwd '-m'
+    IF option = 'NOWAIT' THEN
+        LEAVE
+
+    DO j = 1 TO 20
+        rc = SysSleep(3)
+        '@ping www.cdrom.com 2>&1 > nul'
+        IF rc = 0 THEN
+            EXIT
+    END j
+END
+
+EXIT
+þendverbatim
+
+þdescription
+
+þitem Note1:
+
+  You will find an almost identical LOGINISP in the VSZip archive.
+
+þitem Note2:
+
+  This LOGINISP requires a working LOGOUTISP.
+
+þenddescription
+
+
+þh3 LogoutIsp
+þlabel LOGOUTISP.CMD
+þi2 LOGOUTISP.CMD
+
+  LOGOUTISP is an optional script, which allows YIO to disconnect
+  from your ISP.  The following example script will disconnect using
+  the internet dialer.  If you are a customer of Advantis the script
+  will work for you without any changes - other than maybe changing
+  þtt{dialer} and þtt{comPort}.
+
+  This script is a little bit more complicated than LOGINISP,
+  because it will
+
+þenumerate
+þitem
+   block itself to avoid multiple instances of itself
+þitem
+   wait until the dialer has been closed
+þitem
+   force a disconnect of the modem through switching DTR
+þendenumerate
+
+  An almost identical version of the script is contained in the
+  VSZip archive.
+
+þverbatim
+/*
+  LogoutIsp  -  rg211096
+
+  Logoff from your ISP.
+
+  The lines dialer/dialerClose,comPort must be configured
+*/
+
+call RxFuncAdd 'SysLoadFuncs', 'RexxUtil', 'SysLoadFuncs'
+call SysLoadFuncs
+
+dialer      = 'c:\tcpip\bin\dialer.exe'
+dialerClose = dialer '-c'
+comPort     = 'com3'
+
+TRACE('')
+
+parse source . . compCmdName
+cmdName = filespec('name',compCmdName)
+tmpDir  = value('tmp',,'os2environment')
+
+lockFile = ''
+IF tmpDir = '' THEN
+    SAY 'please define %TMP% for locking' CmdName
+ELSE DO
+    lockFile = tmpDir || '\logout.sem'
+    if stream( lockFile,'c','open write') \= 'READY:' then DO
+        SAY CmdName 'already active...'
+        EXIT
+    END
+END
+
+
+if isActive(dialer) then do
+    SAY 'logging off...'
+   '@start /min' dialerClose
+
+   rc = SysSleep( 2 )
+   DO FOREVER
+       IF \isActive(dialer) THEN
+           LEAVE
+       call HangupNow
+       rc = SysSleep( 2 )
+   END
+end
+call HangupNow
+
+IF lockFile \= '' THEN DO
+    rc = stream( lockFile,'c','close' )
+    rc = SysFileDelete( lockFile )
+END
+
+EXIT
+
+
+HangupNow:
+'@mode' comPort || ',dtr=on  > nul'
+'@mode' comPort || ',dtr=off > nul'
+'@mode' comPort || ',dtr=on  > nul'
+RETURN
+
+
+isActive: PROCEDURE
+prog = ARG(1)
+
+'@pstat /c | RXQUEUE'
+
+prog = TRANSLATE(prog)
+found = 0
+DO ii = 1 TO queued()
+    PULL line
+    IF POS(prog,TRANSLATE(line)) \= 0 THEN do
+        found = 1
+        LEAVE
+    END
+END
+RETURN found
+þendverbatim
+
+
+
+þh2 OwnSoup
+þlabel OwnSoup
+þlabel OWNSOUP.EXE
+þindex OwnSoup
+þi2 OwnSoup
+
+  OwnS, with the help of the Yarn ImportProg program, redirects news
+  articles matching a specific pattern into a mail folder.  OwnS can
+  be seen as a notification program to allow easy tracking of
+  news threads you are involved in.
+
+
+þh- Syntax
+
+  þsy{ownsoup [-h] [-b] [-q] <pattern> <groupname> <outputfile>}
+
+  where
+
+þdescription
+þitem þsy{[-h]}
+  search for þsy{<pattern>} in header of article only,
+þitem þsy{[-b]}
+  search for þsy{<pattern>} in body of article only.  The subject line of the header is considered to be part of header and body.
+
+  If þsy{-h} or þsy{-b} is not specified the default is to search the
+  complete article,
+
+þitem þsy{[-q]}
+  be quiet.  Only the number of matches found will be displayed,
+
+þitem þsy{<pattern>}
+  is your search pattern which should be defined according to the þhpt{regular expression} syntax,
+þitem þsy{<groupname>}
+  is a dummy groupname to allow easy filtering.  All the matching articles will contain the header line þsy{X-ownsoup: <groupname>},
+þitem þsy{<outputfile>}
+  is the name of the temporary outputfile (the þtt{.MSG}-extension will be added by OwnS).
+þenddescription
+
+  The generated þsy{<outputfile>} will be registered in the .\AREAS
+  file, thus ImportProg will also find the þsy{<outputfile>}.  Note
+  that the þsy{<outputfile>} will be deleted after the ImportProg so
+  that the actual name you choose is almost unimportant.
+
+
+ þbreak
+þh- Example Setup of OwnSoup
+
+þitemize
+
+þitem
+   Assuming a script is used when importing news, directly before
+   ImportProg is called, a line calling OwnS is placed in the script.
+   This would be something like:
+
+þverbatim
+  ownsoup rgriech stuff4me OwnTemp
+þendverbatim
+
+  This example would search for þsy{"rgriech"} in the header and body
+  sections of each message, writing matching messages to an output
+  file called OwnTemp after marking them with
+
+þverbatim
+  X-ownsoup: stuff4me
+þendverbatim
+  The Yarn ImportProg can now easily filter out any such news articles
+  and put them in a mail folder which in this example we will call
+  þsy{"Personal"}.
+
+   The search pattern here is þsy{"rgriech"} but a more complex
+   pattern could be used, for example I could search on a pattern of
+   þsy{"rgriech|hardy.griech"} which would find either my EMail name
+   or my full name. The '.' wildcard is used in place of a space. The
+   pattern must be in quotes because of the '|' character.
+
+   Note that because no þsy{-h} or þsy{-b} parameter is set, OwnS will
+   search both the header and the body of all messages.
+
+   If you are using YIO, OwnS would be called by setting the
+   þsy{preImportProg} line in YARNIOSET.  Our example would require
+   the following:
+
+þverbatim
+  preImportProg = 'ownsoup rgriech stuff4me OwnTemp'
+þendverbatim
+
+þitem
+
+  To setup a Yarn filter which moves all the messages matching the
+  pattern þsy{"X-ownsoup: stuff4me"} into the mail folder þsy{"Personal"} you
+  would do the following:
+
+  Set up a filter using the Yarn FILTER.EXE program.  When run, this
+  shows a box for details, which you would complete as follows:
+
+þverbatim
+Ú Mail Rule ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                                                          ³
+³  Rule name: MentionsMe                                                   ³
+³                                                                          ³
+³  Search in: ( ) From                                                     ³
+³             ( ) To                                                       ³
+³             ( ) Subject                                                  ³
+³             (*) Header                                                   ³
+³             ( ) Body                                                     ³
+³             ( ) Header and body                                          ³
+³                                                                          ³
+³ Search for: X-ownsoup: stuff4me                                          ³
+³ Match case: No                                                           ³
+³                                                                          ³
+³     Action: (*) Move to folder/newsgroup: Personal                       ³
+³             ( ) Delete                                                   ³
+³                                                                          ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+þendverbatim
+
+  In the þsy{"Search for"} line above, þsy{"X-ownsoup: stuff4me"} represents the
+  string you wish to search for, i.e. the string that OwnS puts in
+  when it finds a match on its own search and þsy{"Personal"} represents
+  the name you wish the new mail folder to have.
+
+  Note that Yarn's filter now only needs to search the header as it is
+  only looking for the þsy{"X-ownsoup: stuff4me"} line.
+
+  After this preparation all incoming news articles will be checked
+  for þsy{<pattern>} as set in OwnS (in this case þsy{"rgriech"}), and
+  matching articles will be moved into the þsy{"Personal"} mail
+  folder.
+
+þitem
+
+   Of course, you can set up more than one filter and if you wish you could put
+   the output in different mail folders.
+
+þenditemize
+
+
+þh- Restriction
+
+   Do not set up þsy{"Personal"} as a newsgroup, because Yarn would
+   skip the filtered articles in this case due to the þtt{Message-ID:}.
+
+
+þh- Others
+
+þitemize
+þitem
+  Articles filtered to þsy{"Personal"} can be þbf{replied} and þbf{followed up}.
+þitem
+  OwnS scans all files contained in .\AREAS matching the SOUP formats
+  þsy{"b"} and þsy{"u"}, i.e. files containing news articles.  The
+  generated file has the binary 8-bit clean mail SOUP format
+  (þsy{"bn"}).
+þenditemize
+
+
+
+þh2 QSoup
+þlabel QSoup
+þlabel QSOUP.EXE
+þindex QSoup
+þi2 QSoup
+
+   QS (pronounce 'queue soup') appends mail and news messages to the
+   Yarn ReplyPacket file for transmission by VSoup.  The messages must
+   contain all required header fields, i.e. QS does not manipulate the
+   content of the message, except that it does '\r' stripping and
+   interpretes ^Z as end of message.
+
+
+þh- Syntax
+
+  þsy{qsoup [-m] [-v] [-i] [-h<dir>] [-l<file>] [<inputfile>]}
+
+  where
+
+þdescription
+þitem þsy{[-m]}
+  the message input to QS is a mail, default is news,
+þitem þsy{[-v]}
+  be verbose,
+þitem þsy{[-i]}
+  ignore all options coming behind the þsy{<-i>}.  This is useful, if
+  the calling program appends command line arguments which are not
+  known by QS,
+þitem þsy{[-r<file>]}
+  set the name of the ReplyPacket to þsy{<file>}.  Default is to read
+  the name of the ReplyPacket from þtt{%HOME%\YARN\CONFIG} in the
+  line reply-packet,
+þitem þsy{[-l<file>]}
+  use þsy{<file>} as the lock file for access control to the ReplyPacket.
+  Default is to use þtt{%YARN%\HISTORY.PAG},
+þitem þsy{[<inputfile>]}
+  is the name of the message file.  If omitted, the message will be
+  read from stdin, thus allowing to connect the message provider and
+  QS through a pipe.
+þenddescription
+
+
+ þbreak
+þh- Example Setup Of QSoup And Sendmail
+
+  Using sendmail has several advantages.  First, it is a standard tool
+  which is used by many programs for mail delivery (e.g. þbf{Lynx}).
+  Second, it is very flexible and allows routing of messages depending
+  on their recipients address.  The second point is also the weakest
+  point of sendmail: it is hard to configure.
+
+  This example shows my setup of sendmail.  But be warned: I am no
+  sendmail expert and to get this configuration running was a lot of
+  fiddling!
+
+ þbreak
+  My changes to the standard configuration were as follows:
+
+þitemize
+þitem
+   take the original sendmail.uml from Warp Connect and copy it to þtt{%ETC%\sendmail.cf},
+þitem
+   insert the following two lines in the very beginning of sendmail.cf:
+þverbatim
+  Cwworkstationname.domain
+  Dwworkstationname.domain
+þendverbatim
+þitem
+   change the þtt{OQ} setting so it reflects the subdirectory of your mail queue
+   (which in fact should not be required, because the mails are received by QS immediately),
+þitem
+   set the þtt{H?F?From:} field to your EMail address.  This will be
+   the default address, if nothing else is specified in the
+   þtt{From:}-header of the message,
+þitem
+   in the þtt{Ruleset 0} at the end of the first section specify the rule
+þverbatim
+  R$+<@$+>              $#local $:$1
+þendverbatim
+   This will instruct sendmail to direct all mails to the local mailer program.
+   Note that the blanks between the þtt{>} and the þtt{$} have to be tabs,
+þitem
+   change the local mailer program, so that it shows the following:
+þverbatim
+  Mlocal, P=d:\b\32\qsoup.exe , F=lmnDFM, S=10, R=0, A=-m -i $u
+þendverbatim
+   You have to replace the þtt{d:\b\32} with the actual QS path.  If this path
+   is not correct, sendmail will not deliver the mails!
+þenditemize
+
+  After you have done the setup, you should check it with a dummy
+  mail.  Type in the following:
+
+þverbatim
+  sendmail -t
+  --->IBM OS/2 SENDMAIL VERSION 1.3.17
+  --->reading ...\sendmail.cf 10
+  to: dummy@x.y.z
+  subject: sendmail/qsoup testing
+
+  Hello
+  ^Z                    (this is a ctrl-Z!)
+  --->11/09/96 19:01:03 mail delivered from:  YourName
+þendverbatim
+
+  Now you can check the successful delivery with the command þtt{unzip
+  -Cp -aa reply-packet mail.msg}.  The output should be something like
+  that:
+
+þverbatim
+  Received: by ibm.net (IBM OS/2 SENDMAIL VERSION 1.3.17/2.12um) id AA3986; ...
+  Date: Sat, 09 Nov 96 18:59:40 +0100
+  From: YourName
+  Message-Id: <9611091759.AA3986@ibm.net>
+  To: dummy@x.y.z
+  Subject: sendmail/qsoup testing
+
+  Hello
+þendverbatim
+
+  Note, that sendmail inserted the missing þtt{Date:}, þtt{From:} and
+  þtt{Message-Id:} header lines (the redundant header þtt{Received:}
+  too).  þtt{YourName} should show the correct settings.
+
+  After successful test you should delete the reply packet file.  For
+  the actual 'diff' of my sendmail.cf and sendmail.umf see also the
+  þhpt{FAQ}.
+
+
+
+ þbreak
+þh- Miscellaneous
+
+þitemize
+þitem
+
+   If you are using QS as a sendmail mailer program you can not setup
+   sendmail as the MAILER of VSoup (see þhpt{environment settings}).
+
+   First, this would result in a deadlock during transmit action
+   of VSoup, because the invoked sendmail would invoke an instance of
+   QS, which could not proceed, because the Yarn ReplyPacket
+   would be held by the transmitting VSoup.
+
+   Second, this would not be a meaningful configuration, because the
+   mail would loop endlessly in your computer without being ever
+   transmitted to the external world.
+
+   If other programs require the MAILER environment variable pointing
+   to sendmail and if sendmail is configured to deliver mails to QS,
+   one should clear MAILER prior to the VSoupSend call.  For YIO
+   operation this could be done in YARNIOSET.
+
+þitem
+   Because QS has to unzip/zip the ReplyPacket, do not expect fast
+   operation.  Anyway appending a message to the ReplyPacket will be
+   much faster than the actual delivery to the network.
+þitem
+   If QS is copied to an executable with the name sendmail (þtt{SENDMAIL.EXE})
+   and is invoked as sendmail, QS mode defaults to
+   'get a mail from stdin'.  If QS is copied to an executable with the name
+   inews (þtt{INEWS.EXE}) and is invoked as inews, QS mode
+   defaults to 'get a news article from stdin'.
+
+   All command line options will be ignored in either case.  Keep in
+   mind, that the messages must contain all required header fields.
+þitem
+   The exact access criteria for ReplyPacket access are as follows:
+þenumerate
+þitem
+      Set þtt{%YARN%\HISTORY.PAG} to writable without access sharing.  This
+      operation must be accomplished successfully.
+      þtt{%YARN%\REPLIES} is the default lock file which can be
+      overridden by the þsy{-l<file>} option.
+þitem
+      The þtt{REPLIES} file in the ReplyPacket subdirectory must not
+      exist.
+þendenumerate
+   Criterion (1) blocks QS, if Yarn is active.  Also this works like a
+   semaphor and prevents multiple instances of QS to access the
+   ReplyPacket.  Criterion (2) prevents QS from accessing the
+   ReplyPacket if it is unzipped, e.g. during VSoupSend.
+
+   Don't forget that an open Yarn or an active VSoupSend
+   blocks QS.  This means, as long as another application accesses
+   either the þtt{lockfile} or the Yarn ReplyPacket, QS can not
+   perform the requested operation.
+þenditemize
+
+
+
+
+þh2 ConvSoup
+þlabel ConvSoup
+þlabel CONVSOUP.EXE
+þindex ConvSoup
+þi2 ConvSoup
+
+  ConvS is a small program which converts the VSoup SOUP output files,
+  which are in binary format (þsy{"bn"} & þsy{"Bn"}) into UNIX mailbox
+  format (þsy{"mn"}) and USENET batch format (þsy{"un"}) respectively.  The
+  output files are written with '\n' as line separator.
+
+  ConvS must be started in the subdirectory that contains the .\AREAS
+  and the .\*.MSG files.
+
+  ConvS is useful for people who wants to use VSoup with offline newsreader which do not
+  recognize VSoup's packet format directly.  Although VSoup complies to SOUP, some readers only
+  know about UNIX mailbox and USENET batch format.
+  E.g. Changi's RNews expects USENET batch format on its input.
+
+
+þh2 ModifyEmxH
+þindex ModifyEmxH
+þi2 ModifyEmxH
+
+  This script is of interest for people who wants to compile VSoup on
+  their own.  MODIFYEMXH.CMD is required for multiple inclusion of the
+  þtt{os2.h} and þtt{os2emx.h} header files.
+
+  MODIFYEMXH.CMD reads form stdin and copies to stdout.  Keep in mind,
+  that multiple inclusion of the above mentioned headers is not
+  standard.  It is just for my convenience.
+
+þh2 RmHigh
+þindex RmHigh
+þi2 RmHigh
+þlabel RmHigh
+þlabel RmHigh.Cmd
+
+  RMHIGH.CMD removes the highlighting from VSOUP.TXT.  This is useful
+  for people who wants to read the documentation in text mode and have
+  no pager or editor available which understands the poor (wo)mans
+  highlighting used in VSOUP.TXT.
+
+  GNUs LESS is an example of a pager that handles the distributed
+  VSOUP.TXT correctly.
+
+
+þh1 Files
+þi1 Files
+
+  This section describes all the input and output files used and
+  generated by VSoup in detail.  Under normal circumstances %HOME%\NEWSRC
+  and %HOME%\SCORE are the only files of interest.  For description of
+  YIO files, see the YIO section.
+
+þipfminitoc
+
+þh2 The Newsrc File
+þlabel Newsrc File
+þlabel %HOME%\NEWSRC
+þlabel NEWSRC
+þi2 The Newsrc File
+
+  %HOME%\NEWSRC contains the list of newsgroups.
+
+þdescription
+þitem ':'
+   behind the name indicates subscribed group, 
+þitem '!'
+  indicates an unsubscribed one.
+þenddescription
+
+  The list of newsgroups can be obtained from the news server by using
+  the -a option of VSoup (see þhpt{FAQ}) or can be prepared with a text
+  editor as follows:
+
+  List the newsgroups you want to receive, one per line, and end each
+  line with a colon. For example:
+
+þverbatim
+  comp.answers:
+  news.answers:
+  rec.humor.funny:
+þendverbatim
+
+  VSoup will keep track of fetched articles by recording the article
+  numbers in this file.
+
+
+ þbreak
+þh- Syntax
+
+  For anyone who really wants to know, the syntax of the file is as
+  follows:
+
+ þsy{%HOME%\NEWSRC ::= <lines>}
+
+ þsy{<lines> ::= <line> <lines> | empty}
+
+ þsy{<line> ::= <groupname> <sep> <article-ranges> "\n"}
+
+ þsy{<sep> ::= "!" | ":"}
+
+ þsy{<article-ranges> ::= <article-ranges> "," <art-range> | <art-range> }
+
+ þsy{<art-range> ::= " " <art-num> | " " <art-num> "-" <art-num> }
+
+  þsy{<groupname>} is the name of a group, þsy{<art-num>} is a long
+  integer.  þsy{<article-ranges>} must be sorted in ascending order to
+  be recognized correctly.  Blanks are only allowed at the indicated
+  positions.
+
+  Under normal circumstances, only the þsy{<sep>} is important to the
+  user for subscribing and unsubscribing groups.
+
+
+þh2 The Score File
+þlabel scorefile explanation
+þlabel score file
+þlabel scoring
+þi2 The Score File
+
+  The score file specifies criteria used to exclude articles from the
+  VSoup packet. You can kill articles that have a specific subject,
+  are from a specific poster, or contain a particular string anywhere
+  in the header.  Even killing of articles which do þbf[not] contain a
+  specific pattern in their header is possible with scoring.
+
+  %HOME%\SCORE is the default score file.  The name and subdirectory of
+  the score file can be configured by specifying the þsy{-K<scorefile>}
+  þhpt{command line option}.  This allows one single score file for all
+  news servers you wish to access.
+
+  An entry in the score file, also called þsy{<score-section>}, has the format:
+
+  þsy[<score-group> "{"]þbreak
+  þsy[    <score-rule>]þbreak
+  þsy{           ...}þbreak
+  þsy["}"]
+
+  with þsy{<score-rule>} being one of the following alternatives:
+
+þenumerate
+þitem
+  þsy[<score> "lines"] þtt[">"] þsy[<number>]
+þitem
+  þsy[<score> "lines"] þtt["<"] þsy[<number>]
+þitem
+  þsy[<score> "pattern" "header" <reg-exp>]
+þitem
+  þsy[<score> "pattern" <where> <reg-exp>]
+þitem
+  þsy[<score> "header" <string>]
+þitem
+  þsy[<score> <where> <string>]
+þendenumerate
+
+  þsy[<score-rule>]s þbf{1.} and þbf{2.} are for scoring of the article
+  length, þbf{3.}  and þbf{4.} are both working with þhpt{regular
+  expressions} (þsy[<reg-exp>]), þbf{5.} and þbf{6.} are working with
+  literal strings (þsy[<string>]).  þbf{3.} and þbf{5.} are scanning
+  the complete header for the corresponding patterns, þbf{4.} and
+  þbf[6.]  are matching its pattern only in the corresponding header
+  line þsy{<where>}.
+
+
+  þbreak  
+þh- Description of the score-section elements
+
+þdescription
+þitem þsy{<score-group>}
+
+   þsy{<score-group>} is a þhpt{regular expression}.  The contained
+   þsy{<score-rule>}s are applied to newsgroups which are matched by
+   the þsy{<score-group>} regular expression completely.  If
+   þsy{<score-group>} is the string þtt{"all"}, the þsy{<score-rule>}s
+   are applied to all newsgroups.
+
+þitem þsy[<score-rule>]
+
+   see above.
+
+þitem þsy{<score>}
+
+   is the score which has been assigned to the þsy[<score-rule>].  All
+   scores of þsy[<score-rule>]s matching an articles header are added
+   up and then compared to the þsy[<kill-threshold>].  If the total
+   score is less than the þsy[<kill-threshold>], the article is
+   killed.
+
+þitem þsy[<where>]
+
+   specifies where to search in the header. þsy{from} searches the
+   þtt{From:} line, þsy{subject} searches the þtt{Subject:} line and
+   so on.  The special þsy{<where>}-pattern þsy{"header"} searches all
+   the lines in the header of the article.
+
+þitem þsy{<reg-exp>}
+
+   is the string in form of a þhpt{regular expression} to search for.
+
+þitem þsy[<string>]
+
+   is the literal string to search for.
+
+þitem þsy[<number>]
+
+   is a line number to which the actual article length is compared.
+
+þenddescription
+
+
+ þbreak
+þh- Special score-sections
+
+There are two special þsy[<score-section>]s:
+
+þdescription
+þitem þsy["quit"]
+   stops reading of the score file immedialtely.
+þitem þsy["killthreshold" <kill-threshold>]
+   sets the threshold for killing articles, i.e. the lowest
+   limit articles should fulfill to not being killed.  The threshold
+   is global (i.e. applies to all groups and rules) and the last
+   occurance of þsy["killthreshold"] counts.
+þenddescription
+
+Lines beginning with a '#' in the first non-blank position are treated as comments.
+
+
+ þbreak
+þh- Remarks
+
+þitemize
+
+þitem
+   All fields are case-insensitive.
+þitem
+   After þsy["header"] and þsy[<where>] a colon (þsy[":"]) is allowed.   
+þitem
+   News transmission speed decreases if a score file is used, because
+   an article is fetched then in two steps: þtt{HEAD <num>}, then
+   þtt{BODY <num>}.  Otherwise an article will be fetched in only one
+   single step: þtt{ARTICLE <num>}.  Offline-Scoring of Yarn is also
+   more flexible than this online-scoring because you can change your
+   mind about the scores þbf{after} reception of the articles!
+þitem
+   It is pretty legal to break the scoring criteria of several þsy{<score-group>}s
+   in several þsy{<score-section>}s.
+þitem 
+   If þsy["header"-<score-rule>]s are applied, the pattern is searched for
+   in the complete header, i.e. one can also match specific header fields.
+þitem
+   The þsy{<score-group>} þtt{"all"} is transformed to the regular
+   expression þtt{".*"}.
+þitem
+   Although the þtt{"."}s in newsgroup names are meta characters of
+   þhpt{regular expressions} this should not do any harm to 'normal'
+   group matching.  E.g. the þsy{<score-group>} expression
+   þtt{"comp.os.os2.programmer.misc"} will match only one group in real life.
+þitem
+   The score file works on news only.
+þitem
+   Check the þhpt{FAQ} for example score files.
+þenditemize
+
+
+
+ þbreak
+þh- Syntax
+
+The exact syntax of the score file is as follows:
+
+ þsy{%HOME%\SCORE ::= {<line> "\n"}*}
+
+ þsy{<line> ::= '#' <text> | <score-section>}
+
+þindent
+
+  Lines beginning with a '#' indicates a comment, þsy{<text>}
+  indicates literal strings.
+
+þendindent
+          
+ þsy{<score-section> ::= "all" "{" <score-rules> "}"} þbreak
+ þsy{                 | <score-group> "{" <score-rules> "}"} þbreak
+ þsy{                 | "killthreshold" <number>} þbreak
+ þsy{                 | "quit"} þbreak
+
+þindent
+
+  þsy{"all"} indicates, that the following þsy{<score-rules>} is valid
+  for all newsgroups, The þhpt{regular expression} þsy{<score-group>}
+  limits the þsy{<score-rules>} to specific newsgroups.
+
+þendindent
+
+ þsy[<score-rules> ::= <score-rule> "\n" {<score-rules>}]
+
+ þsy[<score-rule>  ::= <score> "lines"] þtt[">"] þsy[<number>] þbreak
+ þsy[            | <score> "lines"] þtt["<"] þsy[<number>] þbreak
+ þsy[            | <score> "pattern" "header" <reg-exp>] þbreak
+ þsy[            | <score> "pattern" <where> <reg-exp>] þbreak
+ þsy[            | <score> "header" <string>] þbreak
+ þsy[            | <score> <where> <string>] þbreak
+
+þindent
+
+  þsy[<score>] is a number (the score!), þsy[<number>] too, ,
+  þsy[<reg-exp>] is a þhpt{regular expression}, þsy[<where>] and
+  þsy[<string>] are literal strings.
+
+þendindent
+
+  þbreak
+þdescription
+þitem Note:
+   þsy{"\n"} is the newline character.  It is mandatory!
+þenddescription
+
+
+
+þh3 Regular expression syntax
+þlabel regular expression syntax
+þlabel regular expression
+þlabel regular expressions
+
+   The following description has been taken from the þtt{man regexp}
+   pages (BSD experimental).
+
+   A regular expression is zero or more branches, separated by þsy{|}.
+   It matches anything that matches one of the branches.
+
+   A branch is zero or more pieces, concatenated.  It matches a match
+   for the first, followed by a match for the second, etc.
+
+   A piece is an atom possibly followed by þsy{*}, þsy{+}, or þsy{?}.
+   An atom followed by þsy{*} matches a sequence of 0 or more
+   matches of the atom.  An atom followed by þsy{+} matches a sequence
+   of 1 or more matches of the atom.  An atom followed by þsy{?}
+   matches a match of the atom, or the null string.
+
+   An atom is a regular expression in parentheses (matching a match
+   for the regular expression), a range (see below), þsy{.}  (matching
+   any single character), þsy{^} (matching the null string at the
+   beginning of the input string), þsy{$} (matching the null string at
+   the end of the input string), a þsy{\} followed by a single
+   character (matching that character), or a single character with no
+   other significance (matching that character).
+
+   A range is a sequence of characters enclosed in þsy{[]}.  It
+   normally matches any single character from the sequence.  If the
+   sequence begins with þsy{^}, it matches any single character not
+   from the rest of the sequence.  If two characters in the sequence
+   are separated by þsy{-}, this is shorthand for the full list of
+   ASCII characters between them (e.g. þsy{[0-9]} matches any decimal
+   digit).  To include a literal þsy{]} in the sequence, make it the
+   first character (following a possible þsy{^}).  To include a
+   literal þsy{-}, make it the first or last character.
+
+
+
+þh2 Other Files
+
+þh- .\COMMANDS
+þi2 .\COMMANDS
+
+  contains lines with the syntax: þsy{'sendme' <groupname>
+  <article-ranges>}.  .\COMMANDS is executed instead of standard
+  fetching of news (see also þhpt{News Reception}).  After successful
+  .\COMMANDS processing, the file will be deleted.
+
+þdescription
+þitem Note: 
+   articles which have already been read (marked in %HOME%\NEWSRC) will be skipped!
+þenddescription
+
+þh- %HOME%\NEWSTIME
+þi2 %HOME%\NEWSTIME
+
+  contains the time of the last NNTP connection.  This is for fetching
+  of new newsgroups.  If %HOME%\NEWSTIME does not exist, þbf{all}
+  currently available newsgroups are fetched from the server when
+  VSoup was called with the -a option.
+
+þh- %TMP%\SOUP*.TMP
+þi2 %TMP%\SOUP*.TMP
+
+  temporary files for received articles. þsy{*} will be replaced by a
+  number in the range 0-9999.  If %TMP% is not defined, %TMP% will be
+  substituted by a '.'
+
+
+  þbreak
+þh- .\00*.MSG
+þi2 .\00*.MSG
+
+  contain the received messages (news articles & EMail).  The files
+  are written in the following SOUP formats:
+
+þitemize
+þitem
+   Binary 8-bit clean news format (þsy{"Bn"}) for incoming news.
+   Lines are delimited by a single '\n',
+þitem
+   Binary 8-bit clean mail format (þsy{"bn"}) for incoming mails.
+   Lines are delimited by a single '\n'.
+þenditemize
+   Note that the format of the message files can be changed to UNIX mailbox and USENET batch using ConvS.
+
+
+þh- .\00*.IDX
+þi2 .\00*.IDX
+
+  contain the received newsgroup summaries (-u option).  The files are
+  written in the SOUP þsy{"ic"} format.
+
+þh- .\STSMAIL.MSG
+þi2 .\STSMAIL.MSG
+
+  contains the status message generated by VS.  This file is written
+  in the SOUP UNIX mailbox format (þsy{"mn"}).  Lines are delimited by
+  a single '\n'.
+
+þh- .\AREAS
+þi2 .\AREAS
+
+  contains the table of contents of the received .\00*.MSG / .\00*.IDX
+  files (+ .\STSMAIL.MSG).
+
+
+  þbreak
+þh- .\NEWS.MSG
+þi2 .\NEWS.MSG
+
+  contains the news messages that should be sent to the NNTP server.
+  The following SOUP formats are supported:
+
+þdescription
+þitem þsy{"B"}
+  Binary 8-bit clean news format.  The files are read in binary mode
+  but transferred in text mode to the NNTP host,
+þitem þsy{"u"}
+  USENET batch format with the area name þsy{"news"}.  The files
+  are read in binary mode, thus '\r\n' pairs are treated as two
+  characters (this is not according to RFC1036 but according to Soup12.Html).
+þenddescription
+
+
+
+þh- .\MAIL.MSG
+þi2 .\MAIL.MSG
+
+  contains the mail messages that should be sent to the SMTP server.
+  The following SOUP formats are supported:
+
+þdescription
+þitem þsy{"b"}
+  Binary 8-bit clean mail format.  The files are read in binary mode
+  but transferred in text mode to the SMTP gateway,
+þitem þsy{"u"}
+  USENET batch format with the area name þsy{"mail"}.  The files
+  are read in binary mode, thus '\r\n' pairs are treated as two
+  characters (this is not according to RFC1036 but according to Soup12.Html).
+þenddescription
+
+
+þh- .\REPLIES
+þi2 .\REPLIES
+
+  contains the table of contents of the .\NEWS.MSG / .\MAIL.MSG files
+  to be transmitted.  Instead of the above file names other names
+  could be used too.
+
+
+
+þh1 Insufficiencies, Bugs & Plans
+
+þh- Insufficiencies
+
+þitemize
+
+þitem
+
+   some cmd options, some files are not compatible with Souper16
+
+þitem
+
+   space allocated from the heap is not freed (debugging...)
+
+þitem
+
+   behaviour for news receiving/posting, mail receiving/posting is not
+   symmetrical, i.e.  there is no multithreading except for news
+   receiving...  This will be (perhaps) fixed in a future version
+
+   E.g. start threads for connecting to the hosts for transmission,
+   start a thread for overall transmission, start a thread for overall
+   mail reception.  This all will allow parallel operation of
+   sending/receiving NNTP/POP3/SMTP stuff with one single VSoup.
+
+þitem
+
+   only one single version (for OS/2)
+
+þitem
+
+   it is not clear, how to handle '\r\n' pairs in the SOUP format!
+   Soup12.Html says '\r' should be treated as data, but '\r\n' must be
+   avoided.  In Soup12.Html '\r' are counted just like normal data
+   bytes.
+
+þenditemize
+
+
+
+þh- Bugs
+
+þitemize
+
+þitem
+
+   version of the emx runtime is not checked!
+
+þenditemize
+
+
+þh- Plans
+
+þitemize
+
+þitem
+   remove bugs & insufficiencies
+þitem
+   more situation dependent return codes
+þitem
+   perhaps more status information on the screen
+þitem
+   perhaps the servers IP address will be added to status messages
+þitem
+   perhaps write Subject: to .\STSMAIL.MSG for mail reception/transmission
+þitem
+   real Bcc: implementation for mailing
+þenditemize
+
+
+
+þh1 Author & Acknowledgements
+
+þh- Author
+
+  Hardy Griechþbreak
+  Ernetstr. 10/1þbreak
+  77933 Lahrþbreak
+  Germany
+
+  EMail:  þurl{mailto:rgriech@swol.de (VSoup bug)|rgriech@swol.de}
+
+
+  þbreak
+þh- Acknowledgements
+
+þitemize
+
+þitem
+
+   FSF for GCC (2.7.2.1 used), EMACS (19.33.1 used),
+
+þitem
+   Eberhard Mattes for the GCC & EMACS ports to OS/2 and the
+   documentation utility emxdoc, which made the þtt{.INF}-file possible,
+þitem
+   Chin Huang for Yarn and Souper,
+þitem
+   the gamma testers Jim Holcomb, Kay Pyrtek, Phil Crown and Ralph D. Bednarski,
+þitem
+   Barrie Smith for rework on the documentation, for many suggestions
+   about documentation and a lot of proof reading!
+þitem
+   Timo Maier for his excessive help finding the Warp4 related bug which led to system crashes (see þhpt{history}, VSoup1.2.7).
+þenditemize
+
+
+
+þhtml
+   <A NAME="history"></a>
+þendhtml
+þh1 History
+þlabel history
+
+þh- Version 1.2.8 (190497)
+
+þitemize
+
+þitem
+   new features:
+þitemize
+þitem
+     Scoring introduced, see þhpt{score file}.
+þenditemize
+
+þitem
+   obsolete features:
+þitemize
+þitem
+     The þtt[-l] and þtt[-L] command line options are obsoleted by scoring.  These options allowed length limitations of articles.
+þenditemize
+
+þitem
+   bug fixes:
+þitemize
+þitem
+     Small bug in pop3.cc which led to undefined/sick error messages.
+þenditemize
+
+þitem
+   other internal changes:
+þitemize
+þitem
+     In pop3.cc mails are now no longer blocking the areas-files during mail reception.  Instead incoming mail is copyied into a temporary file.
+     This is a preparation step to allow simultaneous reception of mail/news.
+þenditemize
+þenditemize
+
+
+þh- Version 1.2.7 (120297)
+
+þitemize
+
+þitem
+   new features:
+þitemize
+þitem
+     Port specification in þhpt{URL}s is now supported.
+þitem
+     .\STSMAIL.MSG now contains a þtt{Date:} header field.  This allows import of the
+     .\STSMAIL.MSG into a pseudo newsgroup, see also the Yarn FilterProg program.
+þitem
+     The þtt{Subject:} header line of .\STSMAIL.MSG now contains also the server names
+     which are relevant for the requested operation.
+þitem
+     The first 40K of temporary files are kept in memory to reduce HDD access (class þtt{TFileTmp}).
+þitem
+     National language support (þtt{_nls_tolower()}) introduced for kill expressions, OwnS and hashing.
+þitem
+     newsgroup names in kill files are now regular expressions.
+þitem
+     new Option þsy{-L<n>} allows specification of minimum article length (see þhpt{news receiving options}).
+þitem
+     new Option þsy{-D} forces deletion of mails on POP3 server after reception of each mail (see þhpt{mail receiving options}).
+þitem
+     þhpt{RmHigh.Cmd} added, which removes the highlighting in VSOUP.TXT.
+þenditemize
+
+þitem
+   bug fixes:
+þitemize
+þitem
+    VSoup crashed some Warp4 systems (trap address 0140:7d4c or 0140:7e33).
+    This was fixed through serializing some C library calls (þtt{remove()}, þtt{rename()}, þtt{open()}, þtt{close()}, þtt{read()}, þtt{write()}, þtt{lseek()} and þtt{ftruncate()}).
+    This problem is most likely device driver related, although nothing specific is known. Thanks to Timo, Stefan, Nate, Rodney, Soenke, Tero and Teng Thiam for their help in finding the problem.
+þitem
+    Bug in emxlibcm <= 52 (don't know, what will happen later on):  _fd_init() is not threadsafe, i.e. all callers too (open(), socket(), etc).  Perhaps
+    This is the cause of the trap problem above (not verified, rg120297)
+þitem
+    Incomplete packets are now removed from the SOUP output.  Problems appeared with
+    aborted EMail reception (which writes directly into the SOUP output and not to a temporary).
+þitem
+    -T-1 no longer shows throughput info (see þhpt{global options}).
+þitem
+    Signals were not initialized for þtt{mtGetGroup()} with option -S2.
+þitem
+    In SOUP .\REPLIES the types þsy{"bn"}/þsy{"Bn"} now override the message kind
+    þsy{"mail"}/þsy{"news"}, which is required for type þsy{"u"}.
+þitem
+    handling of þsy{"m"} and þsy{"u"} SOUP format in .\REPLIES corrected (file positioning was wrong).
+þitem
+    "ok, we've read enough..." now displays correctly.
+þitem
+    þtt{%}-display with -S1 reading strategy now (more) correct.
+þitem
+    handling of "\r\n" delimited reply files corrected.
+þitem
+    files are now opened with SH_DENYWR.
+þitem
+    missing NEWSRC is no longer fatal (useful for initial setup).
+þenditemize
+
+þitem
+   other internal changes:
+þitemize
+þitem
+     The threads are no longer killed through þtt{DosKillThread()}.  Instead,
+     threads are killing themselves (when they are detecting an abort condition) through þtt{SIGUSR1}.
+     Sockets are being set to þtt{O_NONBLOCK} to abort current requests.
+þitem
+     þtt{assert(_heapchk() == _HEAPOK)} inserted in some places.
+þitem
+     þtt{nhandles()} aborts after checking 150 handles.
+þenditemize
+
+þenditemize
+
+
+
+þh- Version 1.2.5 (091196)
+
+þitemize
+
+þitem
+
+   Improved Documentation, thanks to Barrie Smith.
+
+   Documentation now in TXT and INF format available, thanks to
+   emxdoc.
+
+þitem
+
+   SOUP format for ImportProg has been changed:
+
+þitemize
+þitem
+      .\STSMAIL.MSG has format þsy{"mn"} (same as before)
+þitem
+      from POP3 incoming Mails have format þsy{"bn"}: binary 8-bit clean mail format.
+      This allows from headers in the first column of the mail, i.e.
+      mail handling is now transparent (old was þsy{"mn"}).
+þitem
+      news have format þsy{"Bn"}: binary 8-bit clean news format (old was
+      þsy{"un"})
+þenditemize
+   To allow the conversion to the old format ConvS has been added.
+
+þitem
+   Added OwnS which filters news articles containing a specific pattern into a mail folder.
+þitem
+   Added QS to allow injection of messages into the SOUP reply packet.
+þitem
+
+   YIO changes:
+þitemize
+þitem
+   YIO now only zips the SEND packets (this is to allow re-edit of the
+   replies).  Received messages are imported via þtt{import -u}.
+   If you have an older version of YARNIOSET it must be updated.
+þitem
+   YIO now supports OwnS.  To allow operation of OwnS the entry þtt{preImportProg} has
+   been added to YARNIOSET.
+þitem
+   YIO now supports up to nine NNTP servers for news reception and up to nine POP3 servers for EMail reception.
+þenditemize
+
+þitem
+
+   -T-1 disables throughput check completely.
+
+þitem
+
+   the þsy{<kill-section>} for one þsy{<group>} can now be seperated,
+   e.g. the kill file may now contain several þsy{"all"} sections.
+
+þitem
+
+   now article ranges are allowed in the þtt{sendme} of .\COMMANDS.
+   This is a non-standard SOUP extension.
+
+þitem
+   bug fixes:
+
+þitemize
+þitem
+      hostname is now fetched through TCP/IP API, no longer from
+      'internet settings'
+þitem
+      it was possible in -S2 that during final catchup of articles
+      the connections were changing group assignment on each fetched
+      article
+þitem
+      catchup did not work as expected.  It sets the %HOME%\NEWSRC, so
+      that in any case 'n' articles were read afterwards.  Display now
+      shows groupLo & groupHi
+þitem
+      ^Z was not recognized correctly for %HOME%\NEWSRC & %HOME%\KILL
+þitem
+      Now again linked dynamically, ths þbf{EMX.DLL} and þbf{EMXLIBCM.DLL} are required
+þitem
+      Lines containing a single '.' were aborting EMails, even if
+      the '.' is actually doubled for transfer.  Don't know if this
+      is an SMTP bug.  Appending a blank behind the '.' helped
+      (i.e. ".. " is actually transferred to the SMTP server).
+      For news articles it works without appending the blank.
+þitem
+      sockets are now opened in text mode, because all the RFCs
+      requires \r\n as a line delimiter.
+þenditemize
+
+þenditemize
+
+
+
+þh- Version 1.2 (061096)
+
+þitemize
+
+þitem
+   first non-beta release
+
+þitem
+   more detailed README
+
+þitem
+
+   YIO enhanced (autodial, disabling specific actions, configuration
+   file, ...)
+
+þitem
+
+   some changes/enhancements/extensions in .\STSMAIL.MSG, e.g.  command
+   line parameters are contain, important server names too...  (useful
+   for debugging)
+
+þitem
+
+   if supported by the NNTP server, the XHDRs are retrieved to
+   determine holes in the article sequence
+
+þitem
+
+   throughput check (-T option) now replaces the old timeout
+   detection.  It is now working for all operations.
+
+þitem
+   news reading, strategy parameter:
+
+þdescription
+þitem -S0
+
+      groups are read sequentially, i.e.  all threads are fetching
+      articles from only one group
+
+þitem -S1
+
+      the next group will be accessed, if one thread goes into waiting
+      state - only small modification of the above
+
+þitem -S2
+
+      it is tried, to keep all threads busy.  I.e.  each thread
+      accesses one dedicated group, groups are read parallel (if there
+      are no more groups to access, the waiting threads are used for
+      parallel reading from one group)
+
+þenddescription
+
+þitem
+
+   more robust (but slower) reading of %HOME%\KILL and %HOME%\NEWSRC.
+   Because it is slower: clean-up your %HOME%\NEWSRC from time to time, if
+   you are using the -a option
+
+þitem
+   bug fixes:
+
+þitemize
+
+þitem
+
+     'internet connection' settings were never ignored (-i did not
+     work)
+
+þitem
+
+      some very minor bug fixes for handling of broken connections
+
+þitem
+
+      under some circumstances broken SMTP connection did not produce
+      an error condition
+
+þitem
+
+      bug in kill file handling fixed (trailing blanks in line were
+      not accepted).  Lines in the kill file can now be outcommented
+      through a '#' as the first non-blank character
+
+þitem
+
+      if getArticle() fails, the according connection will be marked
+      as failed.  This lets VSoup die gracefully, if single
+      connections are cancelled (by whom?)
+
+þitem
+
+      signal handling changed: VSoup tries (!) to kill the sub-threads
+
+þitem
+
+      number of file handles provided by emx is now checked
+
+þitem
+
+      now compiled with emx09c.  During this 'port' it became obvious,
+      that streams are not appropriate.  Thus all file i/o is done
+      directly via handles (class TFile in mts.cc)
+
+þenditemize
+þenditemize
+
+
+
+þh- Version 1.1á (010996)
+
+þitemize
+
+þitem
+   first public beta
+
+þitem
+
+   if NNTP server knows nothing about DATE command, the internal clock
+   will be taken as a reference (required for -a cmd option only)
+
+þitem
+
+   'AUTHINFO USER' / 'AUTHINFO PASS' for nntp server implemented
+   (RFC977 extension).  Call VSoup simply with the nntp-URL
+   nntp://user:passwd@nntpserver
+
+þitem
+
+   NNTP NEXT will only be done, if there is a bigger gap between the
+   articles
+
+þitem
+
+   bug in socket.cc ((char)0xff == (int)-1 !!!)
+
+þenditemize
+
+
+
+þh- Version 1.0á (010896)
+
+þitemize
+
+þitem
+
+   Program is now named VSoup.  I am sorry, but the program again
+   requires the emx DLLs (to my opinion no disadvantage, because most
+   of the people will have them anyway).  Also there is no support for
+   Win95 (this was not intended and I am not sorry, but I have no
+   Win95 system - and I am happy about that ;-)
+
+þitem
+
+   Program is now multithreaded for news reading.  This gives a speed
+   gain of 200%-500% depending on the overall speed of the connection
+   and the number of threads; on the other hand multiple connections
+   have a communication overhead (i.e.  the connections must be
+   established, the groups selected).  Estimated loss is around 5%...
+
+þitem
+
+   Return codes are now much more consistent: on failure an
+   EXIT_FAILURE (1) is returned, on success EXIT_SUCCESS (0)
+
+þitem
+
+   On failure a status mail is generated.  Most of the console
+   messages are redirected into this status mail.  The generation of
+   the mail can be forced thru cmd option -M
+
+þitem
+
+   If file %HOME%\NEWSTIME does not exist, the complete newsgroup list
+   is retrieved from the news server (NNTP LIST)
+
+þitem
+
+   Kill files may have comments ('#' in the first position of a line).
+   This is very beta...
+
+þitem
+
+   Readonly mode is now much more consistent (%HOME%\NEWSTIME is not
+   updated, also the sent articles are not deleted)
+
+þitem
+
+   the default maximum packet size has been changed to unlimited
+
+þitem
+
+   Small bug in %HOME%\NEWSRC handling found (firstUnread was wrong
+   sometimes)
+
+þitem
+
+   automatic timeout for NNTP reception
+
+þenditemize
+
+
+
+
+þhtml
+   <A NAME="faq"></a>
+þendhtml
+þh1 FAQ
+þlabel FAQ
+þindex FAQ
+
+  This sections contains several frequently questions and the
+  corresponding answers.  The questions are:
+
+þipfminitoc
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Why do I get something like '0000002.msg: Too many open files'?
+þendif
+  þbf{Why do I get something like '0000002.msg: Too many open files'?}
+
+  and the related question
+
+  þbf{I am getting the message '...number of threads cut...'.  What does it mean?}
+
+   VSoup needs a lot of open file handles. The YIO script provides
+   these automatically, but if you are not using this script then it
+   is recommended that you add the following line to your CONFIG.SYS:
+   þsy{SET EMXOPT=-h40 -c -n}.  This allows 40 open file handles which
+   should be enough.
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Why is my news reception getting stuck sometimes?
+þendif
+  þbf{Why is my news reception getting stuck sometimes?}
+
+   One common reason is that you are using the wrong (too old) version
+   of the emx-runtime-DLLs.  Check them with emxrev (should show
+   revisions >= 50) and update them if required.  Also you have to
+   avoid a mixture of emx runtime DLLs.
+
+   LINEBREAK
+
+
+
+þif ipf | html
+þh2u Are there any specific problems with the different versions of the emx runtimes?
+þendif
+  þbf{Are there any specific problems with the}
+  þbf{different versions of the emx runtimes?}
+
+  Unfortunately there are!  The revision of the runtime DLLs can be obtained via
+  the command emxrev.  Only the revision numbers of þbf{emx.dll} and þbf{emxlibcm.dl}l are important for VSoup.
+
+þdescription
+þitem revision < 40
+   No way, because nothing of the TCP/IP stuff is included in the C library.
+þitem revision < 50, >= 40
+   This is not recommended, although it should work because VSoup
+   serializes most of the calls to the C library.  Nevertheless you
+   should use the newest available revision of the emx09b runtimes,
+   because there were many changes/bugfixes in the TCP/IP part.
+þitem revision = 50 (also > 50)
+   Check the setting of the environment variable TZ.  It should/must
+   contain a value which is acceptable for the emx C library.
+   Otherwise you will get an SYS3175.
+
+   Revisions > 50 will not crash due to incorrect setting of TZ,
+   anyway they cannot interprete the variable correctly.
+þenddescription
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u I cannot receive EMail from my POP3 server?
+þendif
+  þbf{I cannot receive EMail from my POP3 server?}
+
+þitemize
+þitem
+
+   Check, if your UserId/Password settings are ok
+
+þitem
+
+   Check, that your %ETC%\SERVICES file contains the following lines
+   (see also þhpt{Installation}):
+
+þverbatim
+  pop3        110/tcp       #Post Office Protocol - Version 3
+  pop3        110/udp       #Post Office Protocol - Version 3
+þendverbatim
+
+þitem
+   Alternatively you can insert the port number in the command line POP3 þhpt{URL}.
+þenditemize
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u I have another EMail program.  Therefor I'd like to disable...
+þendif
+  þbf{I have another EMail program.}
+  þbf{Therefor I'd like to disable the RCVMAIL feature of YarnIO.  How do I do this?}
+
+  You simply have to set þtt{soupRcvMail} in YARNIOSET to '' (the empty string).
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Give me sample scripts for simple VSoup IO operation.
+þendif
+  þbf{Give me sample scripts for simple VSoup IO operation.}
+
+þdescription
+þitem Simple Reception:
+   Because this is a simple approach, NEWSRC & SCORE resides in the %HOME% directory.
+þitemize
+þitem
+   change to a directory for IO operation, e.g. þtt{c:\vsoup}.
+þitem
+   call VSoup, e.g.
+þverbatim
+vsoup -M nntp://your.news.server pop3://your.pop3.server
+þendverbatim
+   The output of the VSoup operation will be in the current directory, i.e. in þtt{c:\vsoup} in this example.
+   If your 'internet settings' are setup correctly by your dialer, you could omit the þtt{nntp://} and þtt{pop3://} specifications in the command line.
+þitem
+   feed the received news/EMails and the by VSoup generated status mail into the database of your newsreader.  For Yarn
+   the ImportProg program will be used (e.g. þtt{import -u}).
+þenditemize
+   If you are using different programs for handling news/EMails, you could
+   do two sequential invocations of VSoup:
+þverbatim
+vsoup -Mm nntp://your.news.server
+handle_news_import
+vsoup -Mn pop3://your.pop3.server
+handle_mail_import
+þendverbatim
+   Of course this VSoup instances could also be started parallel through e.g.:
+þverbatim
+start do_news_reception
+start do_mail_reception
+þendverbatim
+   This approach requires a little bit more effort than the sequential one.  Check YIO as an example.
+
+þitem Simple Transmission:
+þitemize
+þitem
+   change to the directory where your reply packets (e.g. þtt{reply.zip}) reside.  If they are zipped (or packed in another way), you have to
+   unzip/unpack them before VSoup will be called (e.g. þtt{unzip -oq reply.zip & del reply.zip}).
+þitem
+   call VSoup, e.g.
+þverbatim
+vsoup -Ms nntp://your.news.server smtp://your.mail.gateway
+þendverbatim
+  Failure of transmission should be handled in a proper way, e.g. if
+  .\REPLIES still exists, you have to rezip the not transmitted
+  news/mails (for Yarn IO you have to invoke þtt{zip -0m reply.zip
+  replies news.msg mail.msg}).
+  If your 'internet settings' are setup correctly by your dialer, you could omit the þtt{nntp://} and þtt{smtp://} specifications in the command line.
+þitem
+  handle the by VSoup generated status mail (e.g. þtt{import -u} for Yarn IO).
+þenditemize
+  If you are using different programs for handling news/mail, you could do two sequential invocations of VSoup or you could start two VSoup parallel (see above).
+þenddescription
+
+
+
+þh- IO for Yarn with simple scripts
+
+We assume, that the IO subdirectory is at þtt{c:\vsoup}, the
+news/EMail reader/writer is Yarn and the server URLs are taken from
+the 'internet settings', a status mail is generated by VSoup, the
+reply packet is stored by Yarn to þtt{c:\vsoup\reply.zip}, the NEWSRC
+& SCORE (if one exists) are located in %HOME%:
+
+þdescription
+þitem Script for simple reception:
+þverbatim
+c:
+cd \vsoup
+vsoup -M
+import -u
+þendverbatim
+þitem Script for simple transmission:
+þverbatim
+c:
+cd \vsoup
+unzip -oq reply
+del reply.zip
+vsoup -Ms
+import -u
+zip -0m reply replies news.msg mail.msg
+þendverbatim
+þenddescription
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u VSOUP.TXT contains strange characters...
+þendif
+  þbf{VSOUP.TXT contains strange characaters.  What's wrong?}
+
+  VSOUP.TXT uses some kind of poor (wo)mans highlighting.  This is obtained through
+  backspacing and overwriting in the ASCII file.  Some Viewers or Editors are not capable
+  of handling such files correctly (GNUs LESS can do it).
+
+  Solution is to remove the highlighting with the small script þhpt{RmHigh}.
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Give me an example scorefile!?
+þendif
+  þbf{Give me an example scorefile!?}
+
+   Here you are:
+
+þverbatim
+  # this is a scorefile for VSoup
+  #
+  all {
+     -1 header microsoft
+     -1 pattern from bill.*gates
+  }
+
+  all {
+     -1 pattern subject make.*money
+     -1 pattern subject \$\$\$
+     -1 x-newsreader forte agent
+  }
+
+  comp.os.os2.mail-news {
+     -1 subject ultimail
+     -1 subject netscape
+     -1 subject help:
+  }
+
+  .*binaries.* {
+     -1 lines < 50
+     -1 lines > 3000
+  }
+
+  comp\..* {
+     -1 lines > 99
+  }
+þendverbatim
+
+þitemize
+þitem
+   First group would kill messages in þsy{all} newsgroups which have
+þitemize
+þitem
+    the word þsy{microsoft} somewhere in the header,
+þitem
+    or are þsy{from} a guy with a þsy{bill}-pattern followed somewhere
+    by a þsy{gates} pattern,
+þenditemize
+
+þitem
+  Second group would again kill messages in þsy{all} newsgroups which have
+þitemize
+þitem
+    þsy{make} followed by þsy{money} in the þsy{subject},
+þitem
+    or contain three consecutive þsy{$$$} in the þsy{subject},
+þitem
+    or contain þsy{forte agent} in the þsy{x-newsreader} header line.
+þenditemize
+
+þitem
+  Third group would kill messages in the þsy{comp.os.os2.mail-news} group
+  which have þsy{subject} lines containing the words þsy{ultimail},
+  þsy{netscape} or þsy{help:}.
+þitem
+  Forth group would kill articles in newsgroups matching þtt{.*binaries.*}, if they contain less than 50 lines or more than 3000 lines.
+þitem
+  Fifth group would kill articles in newsgroups matching þtt{comp\..*}, if they contain more than 99 lines.
+  Note, that the newsgroup þtt{comp.os.os2.mail.news} will match both the third and the fifth group!
+þenditemize
+
+  Also check þhpt{scorefile explanation} and the þhpt{regular
+  expression syntax}.
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u How to kill heavily crossposted articles...
+þendif
+  þbf{How to kill heavily crossposted articles (and thus avoid spams very likely)?}
+
+  Add the following to your score file:
+þverbatim
+  # this kills articles posted to more then 4 groups
+  #
+  all {
+     -1000 pattern newsgroups ,.*,.*,.*,
+  }
+þendverbatim
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u How to convert my old kill file to the new score file format?
+þendif
+  þbf{How to convert my old kill file to the new score file format?}
+
+  Two rules (but no script...):
+
+þitemize
+þitem
+   insert þsy["-1"] at the beginning of each rule,
+þitem
+   if the pattern on the right side contains a regular expression insert þsy["pattern"] behind the þsy["-1"].
+þenditemize
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u I have 8 connections requested for news receiving...
+þendif
+  þbf{I have 8 connections requested for}
+  þbf{news receiving (with the -t8 option),}
+  þbf{but the status message says that}
+  þbf{only 3 threads were connected successfully.}
+  þbf{What's wrong?}
+
+   Nothing! Sometimes it takes very long to establish a connection to
+   the news server which means that VSoup has finished before all
+   requested threads have been connected. It is also possible that a
+   news server might restrict the number of simultaneous connections
+   by one user. I have not heard of this happening, but who knows!
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u I am getting mails, which actually seems to be news articles!?
+þendif
+  þbf{I am getting mails, which actually seems to be news articles!?}
+
+   You are using OwnS somewhere.  If you are using YIO for you I/O
+   operations, check in YARNIOSET the þtt{preImportProg} line, which
+   should either be empty ('') or should contain arguments to match
+   your needs (not þem{mine} as the settings reflect in the sample
+   YARNIOSET in the archive).
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u How can I setup more than one filter with OwnSoup?
+þendif
+  þbf{I am using YARNIO.SET.  How can I setup more than one filter with OwnSoup?}
+
+   You have to use the command concatenator in the þtt{preImportProg}
+   line of YARNIOSET, e.g.
+þverbatim
+preImportProg = 'ownsoup -q rgriech stuff4me OwnTemp'
+preImportProg = preImportProg '&& ownsoup -bq vsoup vsoupstuff VsTemp'
+þendverbatim
+
+   This example will search for þsy{"rgriech"} in header and body and
+   additionally for þsy{"vsoup"} in the body section of the news
+   articles.
+
+   In a second step you have to setup the corresponding mail filter
+   with the Yarn FilterProg program.
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u How to move the VSoup status mails into a pseudo newsgroup?
+þendif
+  þbf{How to move the VSoup status mails into a pseudo newsgroup?}
+
+þitemize
+þitem
+   create a newsgroup with the Yarn utility þbf{newgroup},
+   e.g.
+þverbatim
+   newgroup VSoupStatus 3
+þendverbatim
+   This will create the group
+   þbf{VSoupStatus} with three days expiration time.
+þitem
+   Setup a filter with the Yarn FilterProg.  The filter parameters are as follows:
+þverbatim
+Ú Mail Rule ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                                                          ³
+³  Rule name: VSoup Status                                                 ³
+³                                                                          ³
+³  Search in: ( ) From                                                     ³
+³             (*) To                                                       ³
+³             ( ) Subject                                                  ³
+³             ( ) Header                                                   ³
+³             ( ) Body                                                     ³
+³             ( ) Header and body                                          ³
+³                                                                          ³
+³ Search for: vsoupuser                                                    ³
+³ Match case: No                                                           ³
+³                                                                          ³
+³     Action: (*) Move to folder/newsgroup: VSoupStatus                    ³
+³             ( ) Delete                                                   ³
+³                                                                          ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+þendverbatim
+þenditemize
+
+  From now on the VSoup status mails are put into the newsgroup
+  þbf{VSoupStatus}.  Because the þtt{Subject:} header also contains
+  the server names, Yarn will automatically sort the status mail/news
+  by action.
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u How do I get a listing of all available newsgroups?
+þendif
+  þbf{How do I get a listing of all available newsgroups?}
+
+   Delete the file NEWSTIME in the directory of your NEWSRC file and
+   call VSoup with the -a option the next time.  After that you will get
+   a status mail and the available groups are appended to your NEWSRC
+   file.  Note that groups already contained in NEWSRC will not appear
+   in the status mail.
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u How to clean up the NEWSRC file?
+þendif
+  þbf{How to clean up the NEWSRC file?}
+
+   After a while the NEWSRC will contain many unsubscribed
+   groups if VSoup will be called with the -a option.  You can get rid
+   off those unsubscribed groups with the following commands:
+þverbatim
+   cd 'directory of newsrc'
+   find ":" < newsrc > newsrc.tmp
+   copy newsrc.tmp newsrc
+   del newsrc.tmp
+þendverbatim
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u How to subscribe to a newsgroup?
+þendif
+  þbf{How to subscribe to a newsgroup?}
+
+þitemize
+þitem
+   Open the NEWSRC file of the NNTP server you like to add an
+   subscription,
+þitem
+   add the line þtt{GroupYouLikeToSubscribe:} to the file.
+þenditemize
+
+  On the next import to Yarn, ImportProg will add the new group to the
+  þtt{%YARN\ACTIVE} file automatically with defaults specified in the
+  þtt{%HOME%\YARN\CONFIG} file (þtt{keep} and þtt{max-keep} entries).
+  It is not required to invoke the Yarn þbf{newgroup} command.  The
+  new group will also appear in the þtt{newsgroup selection level} of
+  Yarn.
+
+  Keep in mind that there are several NEWSRC files!  Some of them are
+  used by VSoup (especially if you access multiples NNTP servers),
+  others are used by Yarn (i.e. þtt{%HOME%\YARN\NEWSRC}).
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u How to unsubscribe and delete a newsgroup?
+þendif
+  þbf{How to unsubscribe and delete a newsgroup?}
+
+þitemize
+þitem
+   Delete the newsgroup from the corresponding NEWSRC file,
+þitem
+   if you have one single NEWSRC file or multiple NEWSRC files and
+   none of them contains any longer the respective group you could delete the
+   newsgroup from the þtt{%YARN%\NEWS.DAT} database with the Yarn
+   þbf{rmgroup} command.
+þenditemize
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Can I abort VSoup operation safely?
+þendif
+  þbf{Can I abort VSoup operation safely?}
+
+   Yes, it is safe to abort VSoup by ^C or ^BREAK.  The following takes place:
+
+þdescription
+þitem News reception:
+
+   VSoup will save the current NEWSRC contents and the articles are
+   stored after the reception of each single article into the
+   corresponding .\00*.MSG file.  The .\AREAS file will be left in a
+   proper state for import.
+
+þitem EMail reception:
+
+   The QUIT command will not be sent to the POP3 server, which means
+   that the mailbox will not be emptied which again means that when
+   you next call you will get the already received EMails of the
+   aborted VSoup session again.
+
+þitem News transmission:
+
+   Double sent articles are detected by the news server and will be
+   rejected by it.  This special type of rejection (435 & 437 error
+   number in NNTP reply) will be considered by VSoup as a non-error
+   condition, thus the articles are handled as having been
+   successfully delivered (which in fact they are).
+
+þitem EMail transmission:
+
+   If the VSoup session has been aborted during EMail transmission, the
+   whole EMail batch will be resent.
+
+þenddescription
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Can you show me the 'diff' between your sendmail.cf and...
+þendif
+   þbf{Can you show me the 'diff' between your sendmail.cf and the original sendmail.uml?}
+
+  Of course, but you should be capable of reading 'diffs'.  Also be aware, that sendmail
+  requires tabs as delimiter between the ruleset fields.
+
+þverbatim
+*** sendmail.uml        Tue Oct  3 23:09:04 1995
+--- d:sendmail.cf       Sat Nov  9 19:20:30 1996
+***************
+*** 1,3 ****
+--- 1,7 ----
++ Cwswol.de
++ Dwswol.de
+  #########################################################################
+  #                                                                       #
+  #  Sendmail                                                             #
+***************
+*** 102,108 ****
+  #
+  # If macro R is undefined, then mail for internal destinations will be
+  # delivered directly
+! DDYour.Domain
+  
+  # Internal, directly connected domains
+  #
+--- 106,112 ----
+  #
+  # If macro R is undefined, then mail for internal destinations will be
+  # delivered directly
+! DD
+  
+  # Internal, directly connected domains
+  #
+***************
+*** 154,160 ****
+  # SMTP read timeout
+  Or15m
+  # Queue directory - this must be changed if TCP/IP is moved!
+! OQC:\MPTN\ETC\mqueue
+  # Always queue for safety
+  Os
+  # Time to live in the queue
+--- 158,164 ----
+  # SMTP read timeout
+  Or15m
+  # Queue directory - this must be changed if TCP/IP is moved!
+! OQd:\ETC\MQUEUE
+  # Always queue for safety
+  Os
+  # Time to live in the queue
+***************
+*** 173,179 ****
+  #
+  HReceived: $?sfrom $s $.by $j ($v/$Z) id $i; $b
+  H?D?Date: $a
+! H?F?From: $q
+  H?M?Message-Id: <$t.$i@$j>
+  H?D?Resent-Date: $a
+  H?F?Resent-From: $q
+--- 177,183 ----
+  #
+  HReceived: $?sfrom $s $.by $j ($v/$Z) id $i; $b
+  H?D?Date: $a
+! H?F?From: Hardy Griech <rgriech@swol.de>
+  H?M?Message-Id: <$t.$i@$j>
+  H?D?Resent-Date: $a
+  H?F?Resent-From: $q
+***************
+*** 297,302 ****
+--- 301,307 ----
+  R$* : $* ;              $#error $@ USAGE $: "list:; syntax illegal for...
+  R<@ $+>                 $#error $@ USAGE $: "user address required"
+  R<$* : $* >             $#error $@ USAGE $: "colon illegal in host name part"
++ R$+<@$+>                $#local $:$1
+  
+  # handle numeric address spec
+  R$* < @ [ $+ ] > $*     $#smtp $@ [$2] $: $1 < @ [$2] > $3      numeric...
+***************
+*** 387,393 ****
+  #
+  
+  Msmtp,  P=[IPC], F=mDFMuX, S=10, R=0, A=IPC $h
+! Mlocal, P=C:\TCPIP\UMAIL\UMAILER.EXE , F=lsm, S=10, R=0, A=-dest C:\TCP...
+  Mprog,  P=xxx, A=Required by sendmail but unused
+  
+  
+--- 392,398 ----
+  #
+  
+  Msmtp,  P=[IPC], F=mDFMuX, S=10, R=0, A=IPC $h
+! Mlocal, P=d:\b\32\qsoup.exe , F=lmnDFM, S=10, R=0, A=-m -i $u
+  Mprog,  P=xxx, A=Required by sendmail but unused
+þendverbatim
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Can I use VSoup together with Changi?
+þendif
+  þbf{Can I use VSoup together with Changi?}
+
+   Yes, you can use VSoup as the news feeder for Changi.  For reply
+   transmission Chanx must still be used.  The following setup should work:
+
+þitemize
+þitem
+   setup VSoup for news reception as described in the þhpt{installation} section,
+þitem
+   after VSoup operation ConvS must be called, which converts the .\00*.MSG from binary format to the USENET batch format,
+þitem
+   then do a þtt{copy 00*.msg all_in_one},
+þitem
+   then call the Changi RNews with þtt{all_in_one} as input file.
+þenditemize
+
+   The above is not tested!  If anybody likes to confirm the
+   procedure, please send me an EMail.  Anyway the .\STSMAIL.MSG is
+   not handled by the above procedure.
+
+þdescription
+þitem Remark:
+        The question 'why should I use VSoup together with Changi?' is
+        triggered by the fact that several news servers do not allow the
+        NEWNEWS command, which is used by Chanx for multithreaded news reception.
+þenddescription
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Can I use VSoup together with another offline newsreader...
+þendif
+  þbf{Can I use VSoup together with another offline newsreader than Yarn/Changi?}
+
+  VSoup can be used as news/mail client for all offline newsreaders which expect
+  SOUP format as input and generate articles in SOUP format on the output side.
+  Perhaps ConvS has to be used to convert the received messages into the correct
+  data format known by your newsreader.
+
+  For squish based newsreader there exists a free converter which makes VSoup usable
+  also for people prefering such readers.
+
+  Reports of successfully combining VSoup with other newsreaders than Yarn and the corresponding recipes
+  are highly welcome and (c|sh)ould be submitted to þurl{mailto:rgriech@swol.de (VSoup Combination)|rgriech@swol.de}.
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Where to obtain more information about SOUP?
+þendif
+  þbf{Where to obtain more information about SOUP?}
+
+  For more information about SOUP refer to Soup12.Html which can be
+  found on the net, e.g. at
+  þurl{http://www.eden.com/~combee/soup12.html}.
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Where are the internet standards described?
+þendif
+  þbf{Where are the internet standards described?}
+
+  The internet standards are described in Request For Comment
+  documents (RFC).  VSoup uses the NNTP, POP3 and SMTP standards.
+  A good starting point for RFC reading is e.g.
+  þurl{http://ds2.internic.net/ds/rfc-index.html}.
+
+  RFCs of interest are:
+þdescription
+þitem þurl{http://ds2.internic.net/rfc/rfc821.txt|RFC821}
+   Simple Mail Transfer Protocol,
+þitem þurl{http://ds2.internic.net/rfc/rfc822.txt|RFC822}
+   Standard for the format of ARPA Internet text messages,
+þitem þurl{http://ds2.internic.net/rfc/rfc977.txt|RFC977}
+   Network News Transfer Protocol,
+þitem þurl{http://ds2.internic.net/rfc/rfc1036.txt|RFC1036}
+   Standard for interchange of USENET messages,
+þitem þurl{http://ds2.internic.net/rfc/rfc1460.txt|RFC1460}
+   Post Office Protocol - Version 3.
+þenddescription
+
+  LINEBREAK
+
+ 
+
+þhtml
+   <A NAME="download"></a>
+þendhtml
+þif ipf | html
+þh2u Where can I obtain the latest version of VSoup?
+þendif
+  þbf{Where to obtain the latest version of VSoup?}
+
+   I will upload public releases of VSoup to þtt{ftp.cdrom.com},
+   þtt{ftp.leo.org} and þtt{ftp-os2.nmsu.edu} (Hobbes).  The
+   corresponding URLs are:
+
+þitemize
+þitem
+
+   þurl{ftp://ftp.leo.org/pub/comp/os/os2/leo/tcpip/news/|ftp://ftp.leo.org/pub/comp/os/os2/leo/tcpip/news/vsoup*.zip}
+
+þitem
+
+   þurl{ftp://ftp.cdrom.com/pub/os2/new/|ftp://ftp.cdrom.com/pub/os2/new/vsoup*.zip}, later on it
+   can be found at
+   þurl{ftp://ftp.cdrom.com/pub/os2/internet/|ftp://ftp.cdrom.com/pub/os2/internet/vsoup*.zip}.
+
+þitem
+
+   þurl{ftp://ftp-os2.nmsu.edu/new/|ftp://ftp-os2.nmsu.edu/new/vsoup*.zip}, later on it
+   can be found at
+   þurl{ftp://ftp-os2.nmsu.edu/os2/internet/|ftp://ftp-os2.nmsu.edu/os2/internet/vsoup*.zip}.
+
+þenditemize
+
+   Version notification will take place in the Yarn mailing list.
+
+   The current update frequency is at about one release per month.
+   But this will stabilize in the very near future (09-Nov-1996).
+
+   þbf{Experimental} versions can be downloaded from
+   þurl{http://privat.swol.de/ReinhardGriech/vsoup.zip}.  þbf{Very
+   experimental} - one could say: alphas - can be obtained from
+   þurl{http://privat.swol.de/ReinhardGriech/vsoupbeta.zip}.  Content
+   of both archives is only an executable of VSoup.  The alpha version
+   could contain perhaps some debugging output.  þbf{Neither there is
+   a guarantee that versions downloaded from} þbf{this site will work,
+   nor will they be supported in any way from my side} (if anybody
+   likes to call that support...).
+
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u Where to obtain the latest version of Yarn?
+þendif
+  þbf{Where to obtain the latest version of Yarn?}
+
+  Best place to check is þurl{http://www.vex.net/yarn/}.  For
+  notification about new versions check the Yarn mailing list.
+
+  LINEBREAK
+
+
+
+þif ipf | html
+þh2u How to subscribe to the Yarn mailing list?
+þendif
+  þbf{How to subscribe to the Yarn mailing list?}
+
+  To subscribe to the mailing list, mail a message to
+  þurl{mailto:listproc@lists.colorado.edu|listproc@lists.colorado.edu}.  The body of the message should be
+  the line þtt{subscribe yarn-list Your Full Name}, assuming þtt{Your
+  Full Name} is your full name.  If it isn't, substitute your own
+  name.
